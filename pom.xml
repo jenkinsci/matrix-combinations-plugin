@@ -44,6 +44,14 @@
     </pluginRepositories>
 	
 
+    <dependencies>
+      <dependency>
+        <groupId>com.sonyericsson.hudson.plugins.rebuild</groupId>
+        <artifactId>rebuild</artifactId>
+        <version>1.21</version> <!-- RebuildParameterProvider is available since 1.21 -->
+        <optional>true</optional>
+      </dependency>
+    </dependencies>
     <build>
         <plugins>
            <!-- <plugin>
