@@ -1,4 +1,4 @@
-package com.sonyericsson.rebuild.RebuildAction
+package hudson.plugins.matrix_configuration_parameter.MatrixCombinationsParameterValue
 
 
 import hudson.matrix.AxisList
