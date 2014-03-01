@@ -52,9 +52,9 @@ private void drawTableBall(MatrixBuild.RunPtr runPtr,AxisList axes,matrixValue,M
             if (!layouter.x || !layouter.y) {
               text(runPtr.combination.toString(layouter.z))
             }
-            f.checkbox(checked: "true", name: "values",id: "checkbox"+matrixValue.getName());
-            input(type: "hidden", name: "confs", value: runPtr.combination.toString());
         }
+        f.checkbox(checked: "true", name: "values",id: "checkbox"+matrixValue.getName());
+        input(type: "hidden", name: "confs", value: runPtr.combination.toString());
 
     } else {
         img(src: "${imagesURL}/24x24/grey.gif");
