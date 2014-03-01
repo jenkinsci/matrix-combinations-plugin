@@ -23,6 +23,7 @@
  */
 package hudson.plugins.matrix_configuration_parameter;
 
+import hudson.matrix.AxisList;
 import hudson.matrix.Combination;
 import hudson.model.*;
 
@@ -85,7 +86,7 @@ public class MatrixCombinationsParameterValue extends ParameterValue {
             }
         };
     }
-    public boolean combinationExists(Combination c){
+    public boolean combinationExists(AxisList axes, Combination c){
 
 
         if (values == null || confs == null || values.length != confs.length)
@@ -96,6 +97,10 @@ public class MatrixCombinationsParameterValue extends ParameterValue {
                 return true;
         }
         return false;
+    }
+    @Deprecated
+    public boolean combinationExists(Combination c){
+        return combinationExists(null, c);
     }
 
     @Override

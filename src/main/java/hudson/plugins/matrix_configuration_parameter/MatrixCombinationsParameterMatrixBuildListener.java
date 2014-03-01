@@ -54,7 +54,7 @@ public class MatrixCombinationsParameterMatrixBuildListener extends MatrixBuildL
         }
         for (MatrixCombinationsParameterValue value
                 :Util.filter(paction.getParameters(), MatrixCombinationsParameterValue.class)) {
-            if (!value.combinationExists(c.getCombination())) {
+            if (!value.combinationExists(b.getParent().getAxes(), c.getCombination())) {
                 return false;
             }
         }

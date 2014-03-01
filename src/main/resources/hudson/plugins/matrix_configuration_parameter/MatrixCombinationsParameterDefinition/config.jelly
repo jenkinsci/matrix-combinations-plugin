@@ -31,4 +31,9 @@ THE SOFTWARE.
     <f:entry title="${%Description}" help="/help/parameter/description.html">
         <f:textarea field="description" />
     </f:entry>
+    <f:advanced>
+        <f:entry field="defaultCombinationFilter" title="${%Default Filter}">
+          <f:textbox />
+        </f:entry>
+    </f:advanced>
 </j:jelly>
