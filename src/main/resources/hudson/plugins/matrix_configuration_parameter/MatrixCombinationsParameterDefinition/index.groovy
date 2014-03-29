@@ -86,7 +86,7 @@ private void drawMainBall(Combination combination,AxisList axes,String matrixNam
     if (lastBuild != null && lastBuild.getRun(combination)!=null){
         lastRun = lastBuild.getRun(combination);
         if (lastRun != null){
-            a(href:request.getRootPath()+"/"+lastRun.getUrl()){
+            a(href:rootURL+"/"+lastRun.getUrl()){
             img(src: "${imagesURL}/24x24/"+lastRun.getBuildStatusUrl())
             if (!layouter.x || !layouter.y) {
               text(combination.toString(layouter.z))

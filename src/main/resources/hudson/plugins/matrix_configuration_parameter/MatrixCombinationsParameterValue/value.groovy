@@ -99,7 +99,7 @@ private void drawTableBall(MatrixBuild.RunPtr runPtr,AxisList axes,MatrixCombina
     run = runPtr.getRun();
     result = matrixValue.combinationExists(runPtr.combination);
     if (result){
-        a(href:request.getRootPath()+"/"+run.getUrl()){
+        a(href:rootURL+"/"+run.getUrl()){
             img(src: "${imagesURL}/24x24/"+run.getBuildStatusUrl());
             f.checkbox(checked: "true",onclick:"return false;", onkeydown:"return false;", name: "values",id: "checkbox"+matrixValue.getName());
             input(type: "hidden", name: "confs", value: runPtr.combination.toString());
