@@ -45,7 +45,7 @@ private void drawParameterBody(Namespace f,valueIt,AxisList axes,MatrixProject p
 private void drawTableBall(MatrixBuild.RunPtr runPtr,AxisList axes,matrixValue,MatrixProject project,Layouter layouter) {
 
     run = runPtr.getRun();
-    result = matrixValue.combinationExists(runPtr.combination);
+    result = matrixValue.combinationExists(axes, runPtr.combination);
     if (result){
         a(href:rootURL+"/"+run.getUrl()){
             img(src: "${imagesURL}/24x24/"+run.getBuildStatusUrl());

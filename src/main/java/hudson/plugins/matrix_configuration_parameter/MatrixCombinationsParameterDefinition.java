@@ -29,6 +29,7 @@ import hudson.model.ParameterValue;
 
 import net.sf.json.JSONObject;
 
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -36,14 +37,24 @@ import org.kohsuke.stapler.StaplerRequest;
 public class MatrixCombinationsParameterDefinition extends ParameterDefinition {
 
     private static final long serialVersionUID = 1L;
+    private final String defaultCombinationFilter;
 
-
-
-    @DataBoundConstructor
-    public MatrixCombinationsParameterDefinition(String name, String description) {
-        super(name, description);
+    /**
+     * @return groovy expression to specify default checked combinations
+     */
+    public String getDefaultCombinationFilter() {
+        return defaultCombinationFilter;
     }
 
+    @DataBoundConstructor
+    public MatrixCombinationsParameterDefinition(String name, String description, String defaultCombinationFilter) {
+        super(name, description);
+        this.defaultCombinationFilter = !StringUtils.isBlank(defaultCombinationFilter)?defaultCombinationFilter:null;
+    }
+
+    public MatrixCombinationsParameterDefinition(String name, String description) {
+        this(name, description, null);
+    }
 
     @Override
     public ParameterValue createValue(StaplerRequest req, JSONObject jo) {
@@ -67,7 +78,7 @@ public class MatrixCombinationsParameterDefinition extends ParameterDefinition {
 
     @Override
     public MatrixCombinationsParameterValue getDefaultParameterValue() {
-        MatrixCombinationsParameterValue v = new MatrixCombinationsParameterValue(getName(), new Boolean[]{},new String[]{});
+        MatrixCombinationsParameterValue v = new DefaultMatrixCombinationsParameterValue(getName(), getDescription(), getDefaultCombinationFilter());
         return v;
     }
 

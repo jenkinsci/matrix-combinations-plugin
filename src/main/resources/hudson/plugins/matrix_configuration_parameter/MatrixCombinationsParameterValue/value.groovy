@@ -97,7 +97,7 @@ private void drawTableHeader(Layouter layouter) {
 private void drawTableBall(MatrixBuild.RunPtr runPtr,AxisList axes,MatrixCombinationsParameterValue matrixValue,MatrixProject project) {
 
     run = runPtr.getRun();
-    result = matrixValue.combinationExists(runPtr.combination);
+    result = matrixValue.combinationExists(axes, runPtr.combination);
     if (result){
         a(href:rootURL+"/"+run.getUrl()){
             img(src: "${imagesURL}/24x24/"+run.getBuildStatusUrl());

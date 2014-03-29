@@ -7,6 +7,7 @@ import hudson.matrix.MatrixBuild
 import hudson.matrix.MatrixProject
 import lib.LayoutTagLib
 import org.kohsuke.stapler.jelly.groovy.Namespace
+import hudson.plugins.matrix_configuration_parameter.MatrixCombinationsParameterDefinition;
 
 l = namespace(LayoutTagLib)
 t = namespace("/lib/hudson")
@@ -20,6 +21,7 @@ if (project == null)   //in case project is not a Matrix Project
     return;
 
 AxisList axes =  project.getAxes();
+def paramDef = it;
 String nameIt = it.getName();
 Layouter layouter = axes == null ? null : new Layouter<Combination>(axes) {
     protected Combination getT(Combination c) {
@@ -31,9 +33,9 @@ Layouter layouter = axes == null ? null : new Layouter<Combination>(axes) {
 
 
 
-drawMainBody(f, nameIt, axes, project, layouter)
+drawMainBody(paramDef, f, nameIt, axes, project, layouter)
 
-private void drawMainBody(Namespace f, String nameIt, AxisList axes,MatrixProject project,Layouter layouter) {
+private void drawMainBody(MatrixCombinationsParameterDefinition paramDef, Namespace f, String nameIt, AxisList axes,MatrixProject project,Layouter layouter) {
 
     drawMainLinksJS(nameIt)
 
@@ -42,7 +44,7 @@ private void drawMainBody(Namespace f, String nameIt, AxisList axes,MatrixProjec
         div(name: "parameter") {
             input(type: "hidden", name: "name", value: nameIt)
             nsProject.matrix(it: project) {
-              drawMainBall(p.combination, project.axes, nameIt, project, layouter);
+              drawMainBall(paramDef, p.combination, project.axes, nameIt, project, layouter);
             }
             raw("<span style=\"font-weight:bold\">Select: </span> \n" +
                 "<a href=\"#\" onclick=\"click2Change(0);\">Successful</a> - \n" +
@@ -80,7 +82,7 @@ private void drawMainLinksJS(String nameIt) {
             "</script>\n")
 }
 
-private void drawMainBall(Combination combination,AxisList axes,String matrixName,MatrixProject project,Layouter layouter) {
+private void drawMainBall(MatrixCombinationsParameterDefinition paramDef, Combination combination,AxisList axes,String matrixName,MatrixProject project,Layouter layouter) {
 
     lastBuild = project.getLastBuild();
     if (lastBuild != null && lastBuild.getRun(combination)!=null){
@@ -92,7 +94,7 @@ private void drawMainBall(Combination combination,AxisList axes,String matrixNam
               text(combination.toString(layouter.z))
             }
             }
-            checked = combination.evalGroovyExpression(axes, project.combinationFilter)
+            checked = combination.evalGroovyExpression(axes, paramDef.defaultCombinationFilter?:project.combinationFilter)
             f.checkbox(checked: checked, name: "values",id: "checkbox"+matrixName)
             input(type: "hidden", name: "confs", value: combination.toString())
 
@@ -104,7 +106,7 @@ private void drawMainBall(Combination combination,AxisList axes,String matrixNam
           text(combination.toString(layouter.z))
         }
         
-        checked = combination.evalGroovyExpression(axes, project.combinationFilter)
+        checked = combination.evalGroovyExpression(axes, paramDef.defaultCombinationFilter?:project.combinationFilter)
         f.checkbox(checked: checked, name: "values",id: "checkbox"+matrixName, value: combination.toIndex((AxisList) axes))
         input(type: "hidden", name: "confs", value: combination.toString())
     }
