@@ -88,9 +88,11 @@ public class MatrixCombinationsParameterValue extends ParameterValue {
     }
     public boolean combinationExists(AxisList axes, Combination c){
 
-
         if (values == null || confs == null || values.length != confs.length)
             return false;
+
+        if (values.length == 0)
+            return true;
 
         for (int i = 0; i < values.length ; i++){
             if (confs[i].equals(c.toString()) && values[i]==true)
