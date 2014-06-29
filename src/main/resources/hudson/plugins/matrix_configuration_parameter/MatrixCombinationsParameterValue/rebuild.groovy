@@ -53,7 +53,7 @@ private void drawTableBall(MatrixBuild.RunPtr runPtr,AxisList axes,matrixValue,M
               text(runPtr.combination.toString(layouter.z))
             }
         }
-        f.checkbox(checked: "true", name: "values",id: "checkbox"+matrixValue.getName());
+        f.checkbox(checked: "true", name: "values",id: String.format("checkbox%s-%s", matrixValue.getName(), runPtr.combination.toString('-' as char, '-' as char)));
         input(type: "hidden", name: "confs", value: runPtr.combination.toString());
 
     } else {
@@ -61,7 +61,7 @@ private void drawTableBall(MatrixBuild.RunPtr runPtr,AxisList axes,matrixValue,M
         if (!layouter.x || !layouter.y) {
           text(runPtr.combination.toString(layouter.z))
         }
-        f.checkbox(checked: "false", name: "values",id: "checkbox"+matrixValue.getName());
+        f.checkbox(checked: "false", name: "values",id: String.format("checkbox%s-%s", matrixValue.getName(), runPtr.combination.toString('-' as char, '-' as char)));
         input(type: "hidden", name: "confs", value: runPtr.combination.toString());
     }
 }

@@ -101,13 +101,13 @@ private void drawTableBall(MatrixBuild.RunPtr runPtr,AxisList axes,MatrixCombina
     if (result){
         a(href:rootURL+"/"+run.getUrl()){
             img(src: "${imagesURL}/24x24/"+run.getBuildStatusUrl());
-            f.checkbox(checked: "true",onclick:"return false;", onkeydown:"return false;", name: "values",id: "checkbox"+matrixValue.getName());
+            f.checkbox(checked: "true",onclick:"return false;", onkeydown:"return false;", name: "values",id: String.format("checkbox%s-%s", matrixValue.getName(), runPtr.combination.toString('-' as char, '-' as char)));
             input(type: "hidden", name: "confs", value: runPtr.combination.toString());
         }
 
     } else {
         img(src: "${imagesURL}/24x24/grey.gif");
-        f.checkbox(checked: "false",onclick:"return false;", onkeydown:"return false;", name: "values",id: "checkbox"+matrixValue.getName());
+        f.checkbox(checked: "false",onclick:"return false;", onkeydown:"return false;", name: "values",id: String.format("checkbox%s-%s", matrixValue.getName(), runPtr.combination.toString('-' as char, '-' as char)));
         input(type: "hidden", name: "confs", value: runPtr.combination.toString());
     }
 }
