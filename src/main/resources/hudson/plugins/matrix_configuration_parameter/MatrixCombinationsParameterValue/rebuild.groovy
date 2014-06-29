@@ -30,8 +30,6 @@ drawParameterBody(f, valueIt, axes, project, layouter);
 
 
 private void drawParameterBody(Namespace f,valueIt,AxisList axes,MatrixProject project,Layouter layouter) {
-    h2() { raw("Matrix Combinations") }
-
     f.entry(title: valueIt.getName(), description: it.getDescription()) {
         div(name: "parameter") {
             input(type: "hidden", name: "name", value: valueIt.getName())
