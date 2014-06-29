@@ -12,7 +12,7 @@ l = namespace(LayoutTagLib)
 t = namespace("/lib/hudson")
 st = namespace("jelly:stapler")
 f = namespace("lib/form")
-nsProject = namespace("/lib/hudson/project")
+nsProject = namespace("/hudson/plugins/matrix_configuration_parameter/taglib")
 
 
 MatrixProject project = request.findAncestorObject(MatrixProject.class);
