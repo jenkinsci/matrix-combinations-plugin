@@ -35,6 +35,7 @@ import hudson.model.Result;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.jvnet.hudson.test.Bug;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
 
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
@@ -396,4 +397,33 @@ public class MatrixCombinationsParameterDefinitionTest {
         }
     }
     
+    @Bug(23230)
+    @Test
+    public void testInvalidAxis() throws Exception {
+        MatrixProject p = j.createMatrixProject();
+        
+        AxisList axes = new AxisList(new TextAxis("axis1", "value1", "value2"));
+        p.setAxes(axes);
+        p.setCombinationFilter("axis1 != 'value3'");
+        axes = new AxisList(new TextAxis("axis1", "value1", "value2", "value3"));
+        p.setAxes(axes);
+        
+        p.addProperty(new ParametersDefinitionProperty(
+                new MatrixCombinationsParameterDefinition("combinations", "", "")
+        ));
+        p.save();
+        
+        WebClient wc = j.createAllow405WebClient();
+        HtmlPage page = wc.getPage(p, "build");
+        j.submit(page.getFormByName("parameters"));
+        
+        j.waitUntilNoActivity();
+        MatrixBuild b = p.getLastBuild();
+        assertNotNull(b);
+        j.assertBuildStatusSuccess(b);
+        
+        assertNotNull(b.getExactRun(new Combination(axes, "value1")));
+        assertNotNull(b.getExactRun(new Combination(axes, "value2")));
+        assertNull(b.getExactRun(new Combination(axes, "value3")));
+    }
 }
