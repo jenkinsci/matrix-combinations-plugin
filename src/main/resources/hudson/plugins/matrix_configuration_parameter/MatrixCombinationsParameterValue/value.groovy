@@ -21,45 +21,47 @@ MatrixBuild build = request.findAncestorObject(MatrixBuild.class);
 if (build == null) //in case you are looking at a specific run, MatrixRun Ancestor will replace the MatrixBuild
     return;
 MatrixCombinationsParameterValue valueIt = it;
-Layouter layouter = build.getLayouter();
-if (layouter==null)
-    return;
+Layouter layouter = new Layouter<Combination>(axes) {
+    protected Combination getT(Combination c) {
+        return c;
+    }
+};
 
-drawParameterBody(f, valueIt, axes, project, layouter);
+drawParameterBody(f, valueIt, axes, project, build, layouter);
 
 
 
-private void drawParameterBody(Namespace f,MatrixCombinationsParameterValue valueIt,AxisList axes,MatrixProject project,Layouter layouter) {
+private void drawParameterBody(Namespace f,MatrixCombinationsParameterValue valueIt,AxisList axes,MatrixProject project,MatrixBuild build,Layouter layouter) {
     f.entry(title: valueIt.getName(), description: it.getDescription()) {
         div(name: "parameter") {
             input(type: "hidden", name: "name", value: valueIt.getName())
-            nsProject.matrix(it: build) {
-              drawTableBall(p, project.axes, valueIt, project, layouter);
+            nsProject.matrix(it: build, layouter: layouter) {
+              drawTableBall(p, project.axes, valueIt, project, build, layouter);
             }
         }//div
     }
 }
 
-private void drawTableBall(MatrixBuild.RunPtr runPtr,AxisList axes,MatrixCombinationsParameterValue matrixValue,MatrixProject project,Layouter layouter) {
+private void drawTableBall(Combination combination,AxisList axes,MatrixCombinationsParameterValue matrixValue,MatrixProject project,MatrixBuild build,Layouter layouter) {
 
-    run = runPtr.getRun();
-    result = matrixValue.combinationExists(axes, runPtr.combination);
-    if (result){
+    run = build.getRun(combination);
+    result = matrixValue.combinationExists(axes, combination);
+    if (run != null && result){
         a(href:rootURL+"/"+run.getUrl()){
             img(src: "${imagesURL}/24x24/"+run.getBuildStatusUrl());
             if (!layouter.x || !layouter.y) {
-                text(runPtr.combination.toString(layouter.z))
+                text(combination.toString(layouter.z))
               }
-            f.checkbox(checked: "true",onclick:"return false;", onkeydown:"return false;", name: "values",id: String.format("checkbox%s-%s", matrixValue.getName(), runPtr.combination.toString('-' as char, '-' as char)));
-            input(type: "hidden", name: "confs", value: runPtr.combination.toString());
+            f.checkbox(checked: "true",onclick:"return false;", onkeydown:"return false;", name: "values",id: String.format("checkbox%s-%s", matrixValue.getName(), combination.toString('-' as char, '-' as char)));
+            input(type: "hidden", name: "confs", value: combination.toString());
         }
 
     } else {
         img(src: "${imagesURL}/24x24/grey.gif");
         if (!layouter.x || !layouter.y) {
-            text(runPtr.combination.toString(layouter.z))
+            text(combination.toString(layouter.z))
           }
-        f.checkbox(checked: "false",onclick:"return false;", onkeydown:"return false;", name: "values",id: String.format("checkbox%s-%s", matrixValue.getName(), runPtr.combination.toString('-' as char, '-' as char)));
-        input(type: "hidden", name: "confs", value: runPtr.combination.toString());
+        f.checkbox(checked: "false",onclick:"return false;", onkeydown:"return false;", name: "values",id: String.format("checkbox%s-%s", matrixValue.getName(), combination.toString('-' as char, '-' as char)));
+        input(type: "hidden", name: "confs", value: combination.toString());
     }
 }

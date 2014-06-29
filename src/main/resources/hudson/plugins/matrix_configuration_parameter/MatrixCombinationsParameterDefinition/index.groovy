@@ -23,7 +23,7 @@ if (project == null)   //in case project is not a Matrix Project
 AxisList axes =  project.getAxes();
 def paramDef = it;
 String nameIt = it.getName();
-Layouter layouter = axes == null ? null : new Layouter<Combination>(axes) {
+Layouter layouter = new Layouter<Combination>(axes) {
     protected Combination getT(Combination c) {
         return c;
     }
@@ -43,8 +43,8 @@ private void drawMainBody(MatrixCombinationsParameterDefinition paramDef, Namesp
     f.entry(title: nameIt, description: it.getDescription()) {
         div(name: "parameter") {
             input(type: "hidden", name: "name", value: nameIt)
-            nsProject.matrix(it: project) {
-              drawMainBall(paramDef, p.combination, project.axes, nameIt, project, layouter);
+            nsProject.matrix(it: project, layouter: layouter) {
+              drawMainBall(paramDef, p, project.axes, nameIt, project, layouter);
             }
             raw("<span style=\"font-weight:bold\">Select: </span> \n" +
                 "<a id=\"shortcut-" + nameIt + "-successful\" href=\"#\" onclick=\"click2Change(0);\">Successful</a> - \n" +

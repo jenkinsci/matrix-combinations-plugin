@@ -41,7 +41,8 @@ THE SOFTWARE.
     </st:attribute>
   </st:documentation>
 
-  <j:set var="o" value="${it.layouter}"/>
+  <j:set var="layouter" value="${layouter?:it.layouter}"/>
+  <j:set var="o" value="${layouter}"/>
   <div id='matrix'>
     <j:choose>
       <!-- Optimized case when there's only one dimension to the axis (or zero dimension) -->
