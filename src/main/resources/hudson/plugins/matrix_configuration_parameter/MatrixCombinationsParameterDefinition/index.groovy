@@ -13,7 +13,7 @@ l = namespace(LayoutTagLib)
 t = namespace("/lib/hudson")
 st = namespace("jelly:stapler")
 f = namespace("lib/form")
-nsProject = namespace("/lib/hudson/project")
+nsProject = namespace("/hudson/plugins/matrix_configuration_parameter/taglib")
 
 
 MatrixProject project = request.findAncestorObject(MatrixProject.class);
@@ -23,7 +23,7 @@ if (project == null)   //in case project is not a Matrix Project
 AxisList axes =  project.getAxes();
 def paramDef = it;
 String nameIt = it.getName();
-Layouter layouter = axes == null ? null : new Layouter<Combination>(axes) {
+Layouter layouter = new Layouter<Combination>(axes) {
     protected Combination getT(Combination c) {
         return c;
     }
@@ -43,14 +43,14 @@ private void drawMainBody(MatrixCombinationsParameterDefinition paramDef, Namesp
     f.entry(title: nameIt, description: it.getDescription()) {
         div(name: "parameter") {
             input(type: "hidden", name: "name", value: nameIt)
-            nsProject.matrix(it: project) {
-              drawMainBall(paramDef, p.combination, project.axes, nameIt, project, layouter);
+            nsProject.matrix(it: project, layouter: layouter) {
+              drawMainBall(paramDef, p, project.axes, nameIt, project, layouter);
             }
             raw("<span style=\"font-weight:bold\">Select: </span> \n" +
-                "<a href=\"#\" onclick=\"click2Change(0);\">Successful</a> - \n" +
-                "<a href=\"#\" onclick=\"click2Change(2);\">Failed</a> - \n" +
-                "<a href=\"#\" onclick=\"click2Change(1000);\">All</a> - \n" +
-                "<a href=\"#\" onclick=\"click2Change(-1);\">None</a>")
+                "<a id=\"shortcut-" + nameIt + "-successful\" href=\"#\" onclick=\"click2Change(0);\">Successful</a> - \n" +
+                "<a id=\"shortcut-" + nameIt + "-failed\"     href=\"#\" onclick=\"click2Change(2);\">Failed</a> - \n" +
+                "<a id=\"shortcut-" + nameIt + "-all\"        href=\"#\" onclick=\"click2Change(1000);\">All</a> - \n" +
+                "<a id=\"shortcut-" + nameIt + "-none\"       href=\"#\" onclick=\"click2Change(-1);\">None</a>")
 
         }//div
     }
@@ -64,7 +64,7 @@ private void drawMainLinksJS(String nameIt) {
             "for( i = 0, len = document.parameters.elements.length ; i < len ; i++ )\n" +
             "{\n" +
             "var element = document.parameters.elements[i];\n" +
-            "if( element.type == 'checkbox' && element.id == \"checkbox" + nameIt + "\" )\n" +
+            "if( element.type == 'checkbox' && element.id.lastIndexOf(\"checkbox" + nameIt + "-\", 0) == 0 )\n" +
             "{\n" +
             "if( element.value == status || status > 999 )\n" +
 
@@ -95,7 +95,7 @@ private void drawMainBall(MatrixCombinationsParameterDefinition paramDef, Combin
             }
             }
             checked = combination.evalGroovyExpression(axes, paramDef.defaultCombinationFilter?:project.combinationFilter)
-            f.checkbox(checked: checked, name: "values",id: "checkbox"+matrixName)
+            f.checkbox(checked: checked, name: "values",id: String.format("checkbox%s-%s", matrixName, combination.toString('-' as char, '-' as char)))
             input(type: "hidden", name: "confs", value: combination.toString())
 
         }
@@ -107,7 +107,7 @@ private void drawMainBall(MatrixCombinationsParameterDefinition paramDef, Combin
         }
         
         checked = combination.evalGroovyExpression(axes, paramDef.defaultCombinationFilter?:project.combinationFilter)
-        f.checkbox(checked: checked, name: "values",id: "checkbox"+matrixName, value: combination.toIndex((AxisList) axes))
+        f.checkbox(checked: checked, name: "values",id: String.format("checkbox%s-%s", matrixName, combination.toString('-' as char, '-' as char)), value: combination.toIndex((AxisList) axes))
         input(type: "hidden", name: "confs", value: combination.toString())
     }
 

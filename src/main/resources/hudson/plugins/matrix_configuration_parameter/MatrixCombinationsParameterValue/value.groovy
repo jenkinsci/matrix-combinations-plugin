@@ -13,6 +13,7 @@ l = namespace(LayoutTagLib)
 t = namespace("/lib/hudson")
 st = namespace("jelly:stapler")
 f = namespace("lib/form")
+nsProject = namespace("/hudson/plugins/matrix_configuration_parameter/taglib")
 
 MatrixProject project = request.findAncestorObject(MatrixProject.class);
 AxisList axes = project.getAxes();
@@ -20,94 +21,47 @@ MatrixBuild build = request.findAncestorObject(MatrixBuild.class);
 if (build == null) //in case you are looking at a specific run, MatrixRun Ancestor will replace the MatrixBuild
     return;
 MatrixCombinationsParameterValue valueIt = it;
-Layouter layouter = build.getLayouter();
-if (layouter==null)
-    return;
+Layouter layouter = new Layouter<Combination>(axes) {
+    protected Combination getT(Combination c) {
+        return c;
+    }
+};
 
-drawParameterBody(f, valueIt, axes, project, layouter);
+drawParameterBody(f, valueIt, axes, project, build, layouter);
 
 
 
-private void drawParameterBody(Namespace f,MatrixCombinationsParameterValue valueIt,AxisList axes,MatrixProject project,Layouter layouter) {
-    h2() { raw("Matrix Combinations") }
-
+private void drawParameterBody(Namespace f,MatrixCombinationsParameterValue valueIt,AxisList axes,MatrixProject project,MatrixBuild build,Layouter layouter) {
     f.entry(title: valueIt.getName(), description: it.getDescription()) {
         div(name: "parameter") {
             input(type: "hidden", name: "name", value: valueIt.getName())
-            table(border: "1", class: "middle-align center-align", id: "configuration-matrix") {
-
-                drawTableHeader(layouter);
-
-                drawTableBody(layouter, axes, valueIt, project);
-
-
-            }//table
+            nsProject.matrix(it: build, layouter: layouter) {
+              drawTableBall(p, project.axes, valueIt, project, build, layouter);
+            }
         }//div
     }
 }
 
-private void drawTableBody(Layouter layouter,AxisList axes,MatrixCombinationsParameterValue valueIt,MatrixProject project) {
-    for (row in layouter.rows) {
-        tr() {
-            int i = 0;
-            for (y in layouter.y) {
-                if (row.drawYHeader(i) != null) {
-                    td(rowspan: layouter.height(i), class: "matrix-leftcolumn") { raw(row.drawYHeader(i)) }
+private void drawTableBall(Combination combination,AxisList axes,MatrixCombinationsParameterValue matrixValue,MatrixProject project,MatrixBuild build,Layouter layouter) {
 
-                }
-
-                i++;
-            }
-            for (c in row) {
-                td() {
-                    for (p in c) {
-                        div() {
-                            drawTableBall(p, axes, valueIt, project);
-                        }
-
-
-                    }
-
-
-                }
-
-            }
-        }
-    }
-}
-
-private void drawTableHeader(Layouter layouter) {
-    int i = 0;
-    for (x in layouter.x) {
-        tr(class: "matrix-row") {
-            if (!layouter.y.isEmpty()) {
-                td(colspan: +layouter.y.size(), id: "matrix-title") { raw("Configuration Matrix") }
-            }
-            for (row in 1..layouter.repeatX(i)) {
-                for (axis in x.values) {
-                    td(class: "matrix-header", colspan: layouter.width(i)) { raw(axis) }
-                }
-            }
-        }
-        i++;
-    }
-
-}//entry
-
-private void drawTableBall(MatrixBuild.RunPtr runPtr,AxisList axes,MatrixCombinationsParameterValue matrixValue,MatrixProject project) {
-
-    run = runPtr.getRun();
-    result = matrixValue.combinationExists(axes, runPtr.combination);
-    if (result){
+    run = build.getRun(combination);
+    result = matrixValue.combinationExists(axes, combination);
+    if (run != null && result){
         a(href:rootURL+"/"+run.getUrl()){
             img(src: "${imagesURL}/24x24/"+run.getBuildStatusUrl());
-            f.checkbox(checked: "true",onclick:"return false;", onkeydown:"return false;", name: "values",id: "checkbox"+matrixValue.getName());
-            input(type: "hidden", name: "confs", value: runPtr.combination.toString());
+            if (!layouter.x || !layouter.y) {
+                text(combination.toString(layouter.z))
+              }
+            f.checkbox(checked: "true",onclick:"return false;", onkeydown:"return false;", name: "values",id: String.format("checkbox%s-%s", matrixValue.getName(), combination.toString('-' as char, '-' as char)));
+            input(type: "hidden", name: "confs", value: combination.toString());
         }
 
     } else {
         img(src: "${imagesURL}/24x24/grey.gif");
-        f.checkbox(checked: "false",onclick:"return false;", onkeydown:"return false;", name: "values",id: "checkbox"+matrixValue.getName());
-        input(type: "hidden", name: "confs", value: runPtr.combination.toString());
+        if (!layouter.x || !layouter.y) {
+            text(combination.toString(layouter.z))
+          }
+        f.checkbox(checked: "false",onclick:"return false;", onkeydown:"return false;", name: "values",id: String.format("checkbox%s-%s", matrixValue.getName(), combination.toString('-' as char, '-' as char)));
+        input(type: "hidden", name: "confs", value: combination.toString());
     }
 }
