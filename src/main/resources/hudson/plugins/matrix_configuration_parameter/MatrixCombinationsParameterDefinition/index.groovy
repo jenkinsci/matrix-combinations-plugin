@@ -1,13 +1,10 @@
 package hudson.plugins.matrix_configuration_parameter.matrixcombinationparameterDefinition
 
-import hudson.matrix.AxisList
-import hudson.matrix.Combination
-import hudson.matrix.Layouter
-import hudson.matrix.MatrixBuild
-import hudson.matrix.MatrixProject
+import hudson.matrix.*
+import hudson.model.Result
+import hudson.plugins.matrix_configuration_parameter.MatrixCombinationsParameterDefinition
 import lib.LayoutTagLib
 import org.kohsuke.stapler.jelly.groovy.Namespace
-import hudson.plugins.matrix_configuration_parameter.MatrixCombinationsParameterDefinition;
 
 l = namespace(LayoutTagLib)
 t = namespace("/lib/hudson")
@@ -66,7 +63,7 @@ private void drawMainLinksJS(String nameIt) {
             "var element = document.parameters.elements[i];\n" +
             "if( element.type == 'checkbox' && element.id.lastIndexOf(\"checkbox" + nameIt + "-\", 0) == 0 )\n" +
             "{\n" +
-            "if( element.value == status || status > 999 )\n" +
+            "if( (document.parameters.elements[i+1].getAttribute('data-status') == status) || status > 999 )\n" +
 
             "{\n" +
             "element.checked = true;\n" +
@@ -80,6 +77,16 @@ private void drawMainLinksJS(String nameIt) {
             "return false;\n" +
             "}\n" +
             "</script>\n")
+}
+
+private int encodeRunResult(MatrixRun run) {
+    if (Result.SUCCESS.isWorseOrEqualTo(run.getResult())) {
+        return 0
+    };
+    if (Result.UNSTABLE.isWorseOrEqualTo(run.getResult())) {
+        return 1
+    };
+    return 2;
 }
 
 private void drawMainBall(MatrixCombinationsParameterDefinition paramDef, Combination combination,AxisList axes,String matrixName,MatrixProject project,Layouter layouter) {
@@ -96,7 +103,7 @@ private void drawMainBall(MatrixCombinationsParameterDefinition paramDef, Combin
             }
             checked = combination.evalGroovyExpression(axes, paramDef.defaultCombinationFilter?:project.combinationFilter)
             f.checkbox(checked: checked, name: "values",id: String.format("checkbox%s-%s", matrixName, combination.toString('-' as char, '-' as char)))
-            input(type: "hidden", name: "confs", value: combination.toString())
+            input(type: "hidden", name: "confs", value: combination.toString(),'data-status':encodeRunResult(lastRun))
 
         }
 
@@ -107,8 +114,8 @@ private void drawMainBall(MatrixCombinationsParameterDefinition paramDef, Combin
         }
         
         checked = combination.evalGroovyExpression(axes, paramDef.defaultCombinationFilter?:project.combinationFilter)
-        f.checkbox(checked: checked, name: "values",id: String.format("checkbox%s-%s", matrixName, combination.toString('-' as char, '-' as char)), value: combination.toIndex((AxisList) axes))
-        input(type: "hidden", name: "confs", value: combination.toString())
+        f.checkbox(checked: checked, name: "values",id: String.format("checkbox%s-%s", matrixName, combination.toString('-' as char, '-' as char)))
+        input(type: "hidden", name: "confs", value: combination.toString(), 'data-status': combination.toIndex((AxisList) axes) != -1 ? 0 : -1)
     }
 
 }
