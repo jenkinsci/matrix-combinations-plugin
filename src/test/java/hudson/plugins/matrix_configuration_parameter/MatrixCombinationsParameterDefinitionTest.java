@@ -208,7 +208,6 @@ public class MatrixCombinationsParameterDefinitionTest {
         HtmlPage page = wc.getPage(p, "build");
         HtmlForm form = page.getFormByName("parameters");
         
-        /** This does not work now (JENKINS-23609).
         // Successful link
         {
             ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1")).setChecked(false);
@@ -222,9 +221,7 @@ public class MatrixCombinationsParameterDefinitionTest {
             assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value3")).isChecked());
             
         }
-        */
-        
-        /** This does not work now (JENKINS-23609).
+ 
         // Failed link
         {
             ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1")).setChecked(true);
@@ -238,7 +235,6 @@ public class MatrixCombinationsParameterDefinitionTest {
             assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value3")).isChecked());
             
         }
-        */
         
         // All link
         {
@@ -260,7 +256,7 @@ public class MatrixCombinationsParameterDefinitionTest {
             ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value2")).setChecked(true);
             ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value3")).setChecked(false);
             
-            ((HtmlAnchor)page.getElementById("shortcut-combinations-successful")).click();
+            ((HtmlAnchor)page.getElementById("shortcut-combinations-none")).click();
             
             assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1")).isChecked());
             assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value2")).isChecked());
@@ -332,7 +328,6 @@ public class MatrixCombinationsParameterDefinitionTest {
         HtmlPage page = wc.getPage(p, "build");
         HtmlForm form = page.getFormByName("parameters");
         
-        /** This does not work now (JENKINS-23609).
         // Successful link
         {
             ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-1")).setChecked(true);
@@ -347,9 +342,7 @@ public class MatrixCombinationsParameterDefinitionTest {
             assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-1")).isChecked());
             assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-2")).isChecked());
         }
-        */
         
-        /** This does not work now (JENKINS-23609).
         // Failed link
         {
             ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-1")).setChecked(false);
@@ -364,7 +357,6 @@ public class MatrixCombinationsParameterDefinitionTest {
             assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-1")).isChecked());
             assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-2")).isChecked());
         }
-        */
         
         // All link
         {
@@ -388,7 +380,7 @@ public class MatrixCombinationsParameterDefinitionTest {
             ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-1")).setChecked(false);
             ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-2")).setChecked(true);
             
-            ((HtmlAnchor)page.getElementById("shortcut-combinations-successful")).click();
+            ((HtmlAnchor)page.getElementById("shortcut-combinations-none")).click();
             
             assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-1")).isChecked());
             assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-2")).isChecked());
