@@ -31,12 +31,14 @@ import hudson.matrix.MatrixBuild;
 import hudson.matrix.MatrixProject;
 import hudson.matrix.TextAxis;
 import hudson.model.ParametersDefinitionProperty;
+import hudson.model.queue.QueueTaskFuture;
 import hudson.model.Result;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Bug;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
+import org.jvnet.hudson.test.SleepBuilder;
 
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlCheckBoxInput;
@@ -417,5 +419,27 @@ public class MatrixCombinationsParameterDefinitionTest {
         assertNotNull(b.getExactRun(new Combination(axes, "value1")));
         assertNotNull(b.getExactRun(new Combination(axes, "value2")));
         assertNull(b.getExactRun(new Combination(axes, "value3")));
+    }
+    
+    @Bug(28824)
+    @Test
+    public void testBuildPageForBuilding() throws Exception {
+        MatrixProject p = j.createMatrixProject();
+        
+        AxisList axes = new AxisList(new TextAxis("axis1", "value1", "value2"));
+        p.setAxes(axes);
+        
+        p.addProperty(new ParametersDefinitionProperty(
+                new MatrixCombinationsParameterDefinition("combinations", "", "")
+        ));
+        
+        p.getBuildersList().add(new SleepBuilder(5000));
+        
+        QueueTaskFuture<MatrixBuild> f = p.scheduleBuild2(0);
+        
+        WebClient wc = j.createAllow405WebClient();
+        wc.getPage(p, "build");
+        
+        f.cancel(true);
     }
 }
