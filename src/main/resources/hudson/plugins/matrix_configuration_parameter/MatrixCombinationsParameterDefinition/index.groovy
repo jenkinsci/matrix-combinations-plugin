@@ -13,13 +13,21 @@ f = namespace("lib/form")
 nsProject = namespace("/hudson/plugins/matrix_configuration_parameter/taglib")
 
 
-MatrixProject project = request.findAncestorObject(MatrixProject.class);
-if (project == null)   //in case project is not a Matrix Project
-    return;
-
-AxisList axes =  project.getAxes();
 def paramDef = it;
 String nameIt = it.getName();
+MatrixProject project = request.findAncestorObject(MatrixProject.class);
+if (project == null) {
+   //in case project is not a Matrix Project
+    f.entry(title: nameIt, description: it.getDescription()) {
+        div(name: "parameter") {
+            input(type: "hidden", name: "name", value: nameIt)
+            text(_("Not applicable. Applicable only to multi-configuration projects."))
+        }//div
+    }
+    return;
+}
+
+AxisList axes =  project.getAxes();
 Layouter layouter = new Layouter<Combination>(axes) {
     protected Combination getT(Combination c) {
         return c;
