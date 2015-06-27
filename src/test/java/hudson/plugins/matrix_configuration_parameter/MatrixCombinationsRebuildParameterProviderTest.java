@@ -34,11 +34,15 @@ import hudson.matrix.MatrixBuild;
 import hudson.matrix.MatrixProject;
 import hudson.matrix.TextAxis;
 import hudson.model.Cause;
+import hudson.model.FreeStyleBuild;
+import hudson.model.FreeStyleProject;
 import hudson.model.ParametersAction;
 import hudson.model.ParametersDefinitionProperty;
+import hudson.model.StringParameterValue;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.jvnet.hudson.test.Bug;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
 
@@ -140,5 +144,36 @@ public class MatrixCombinationsRebuildParameterProviderTest
         assertNotNull(b1.getExactRun(new Combination(p.getAxes(), "value1-2", "value2-1")));
         assertNull(b1.getExactRun(new Combination(p.getAxes(), "value1-1", "value2-2")));
         assertNotNull(b1.getExactRun(new Combination(p.getAxes(), "value1-2", "value2-2")));
+    }
+    
+    @Bug(27233)
+    @Test
+    public void testAppliedForNonMatrixProjectRebuild() throws Exception {
+        FreeStyleProject p = j.createFreeStyleProject();
+        
+        @SuppressWarnings("deprecation")
+        Cause cause = new Cause.UserCause();
+        FreeStyleBuild b1 = p.scheduleBuild2(0, cause, Arrays.asList(
+                new ParametersAction(
+                        new MatrixCombinationsParameterValue(
+                                "combinations",
+                                new Boolean[]{ true, false, true },
+                                new String[]{ "axis1=value1", "axis1=value2", "axis1=value3" }
+                        )
+                        // rebuild-plugin causes exception
+                        // when requesting a rebuild with no parameters.
+                        , new StringParameterValue("dummy", "")
+                )
+        )).get();
+        
+        WebClient wc = j.createWebClient();
+        HtmlPage page = wc.getPage(b1, "rebuild");
+        HtmlForm form = page.getFormByName("config");
+        j.submit(form);
+        
+        j.waitUntilNoActivity();
+        
+        FreeStyleBuild b2  = p.getLastBuild();
+        assertNotEquals(b1.getNumber(), b2.getNumber());
     }
 }

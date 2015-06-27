@@ -30,6 +30,8 @@ import hudson.matrix.Combination;
 import hudson.matrix.MatrixBuild;
 import hudson.matrix.MatrixProject;
 import hudson.matrix.TextAxis;
+import hudson.model.FreeStyleBuild;
+import hudson.model.FreeStyleProject;
 import hudson.model.ParametersDefinitionProperty;
 import hudson.model.queue.QueueTaskFuture;
 import hudson.model.Result;
@@ -441,5 +443,27 @@ public class MatrixCombinationsParameterDefinitionTest {
         wc.getPage(p, "build");
         
         f.cancel(true);
+    }
+    
+    @Test
+    public void testAppliedForNonMatrixProject() throws Exception {
+        FreeStyleProject p = j.createFreeStyleProject();
+        p.addProperty(new ParametersDefinitionProperty(
+                new MatrixCombinationsParameterDefinition("combinations", "", "")
+        ));
+        
+        {
+            WebClient wc = j.createAllow405WebClient();
+            HtmlPage page = wc.getPage(p, "build");
+            j.submit(page.getFormByName("parameters"));
+            
+            j.waitUntilNoActivity();
+            FreeStyleBuild b = p.getLastBuild();
+            assertNotNull(b);
+            j.assertBuildStatusSuccess(b);
+        }
+        
+        // default trigger
+        j.assertBuildStatusSuccess(p.scheduleBuild2(0));
     }
 }
