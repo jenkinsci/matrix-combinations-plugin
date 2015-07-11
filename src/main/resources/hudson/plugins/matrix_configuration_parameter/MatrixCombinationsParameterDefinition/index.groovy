@@ -80,6 +80,9 @@ private void drawMainLinksJS(String nameIt) {
 }
 
 private int encodeRunResult(MatrixRun run) {
+    if (run.getResult() == null) {
+        return 0
+    };
     if (Result.SUCCESS.isWorseOrEqualTo(run.getResult())) {
         return 0
     };
