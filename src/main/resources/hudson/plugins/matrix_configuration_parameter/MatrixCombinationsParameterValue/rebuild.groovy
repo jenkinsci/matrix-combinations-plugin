@@ -16,12 +16,21 @@ f = namespace("lib/form")
 nsProject = namespace("/hudson/plugins/matrix_configuration_parameter/taglib")
 
 
-MatrixProject project = request.findAncestorObject(MatrixProject.class);
-AxisList axes = project.getAxes();
-MatrixBuild build = request.findAncestorObject(MatrixBuild.class);
-if (build == null) //in case you are looking at a specific run, MatrixRun Ancestor will replace the MatrixBuild
-    return;
 def valueIt = it;
+
+MatrixProject project = request.findAncestorObject(MatrixProject.class);
+MatrixBuild build = request.findAncestorObject(MatrixBuild.class);
+if (project == null || build == null) {
+    //in case you are looking at a specific run, MatrixRun Ancestor will replace the MatrixBuild
+    f.entry(title: valueIt.getName(), description: it.getDescription()) {
+        // In the case the parameter is not defined in this project,
+        // sending parameters cause rebuild-plugin throws exception.
+        // Acts as if I'm not here.
+        text(_("Not applicable. Applicable only to multi-configuration projects."))
+    }
+    return;
+}
+AxisList axes = project.getAxes();
 Layouter layouter = new Layouter<Combination>(axes) {
     protected Combination getT(Combination c) {
         return c;

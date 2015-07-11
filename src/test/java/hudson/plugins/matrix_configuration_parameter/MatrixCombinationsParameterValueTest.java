@@ -25,14 +25,22 @@
 package hudson.plugins.matrix_configuration_parameter;
 
 import static org.junit.Assert.*;
+
+import java.util.Arrays;
+
 import hudson.matrix.AxisList;
 import hudson.matrix.MatrixBuild;
 import hudson.matrix.MatrixProject;
 import hudson.matrix.TextAxis;
+import hudson.model.Cause;
+import hudson.model.FreeStyleBuild;
+import hudson.model.FreeStyleProject;
+import hudson.model.ParametersAction;
 import hudson.model.ParametersDefinitionProperty;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.jvnet.hudson.test.Bug;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
 
@@ -91,5 +99,24 @@ public class MatrixCombinationsParameterValueTest {
         assertFalse(((HtmlCheckBoxInput)page.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-2")).isChecked());
         assertTrue(((HtmlCheckBoxInput)page.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-1")).isChecked());
         assertTrue(((HtmlCheckBoxInput)page.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-2")).isChecked());
+    }
+    
+    @Bug(27233)
+    @Test
+    public void testNonMatrixBuild() throws Exception {
+        FreeStyleProject p = j.createFreeStyleProject();
+        
+        @SuppressWarnings("deprecation")
+        Cause cause = new Cause.UserCause();
+        FreeStyleBuild b = p.scheduleBuild2(0, cause, Arrays.asList(
+                new ParametersAction(new MatrixCombinationsParameterValue(
+                        "combinations",
+                        new Boolean[]{ true, false, true },
+                        new String[]{ "axis1=value1", "axis1=value2", "axis1=value3" }
+                ))
+        )).get();
+        
+        WebClient wc = j.createWebClient();
+        wc.getPage(b, "parameters");
     }
 }
