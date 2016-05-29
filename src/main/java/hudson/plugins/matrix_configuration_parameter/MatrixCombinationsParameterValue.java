@@ -35,8 +35,6 @@ import hudson.util.VariableResolver;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 
 public class MatrixCombinationsParameterValue extends ParameterValue {
 
@@ -114,7 +112,6 @@ public class MatrixCombinationsParameterValue extends ParameterValue {
         return result;
     }
 
-    @SuppressFBWarnings(value="EQ_GETCLASS_AND_CLASS_CONSTANT", justification="Should match only with MatrixCombinationsParameterValue")
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -123,7 +120,7 @@ public class MatrixCombinationsParameterValue extends ParameterValue {
         if (!super.equals(obj)) {
             return false;
         }
-        if (MatrixCombinationsParameterValue.class != obj.getClass()) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
         MatrixCombinationsParameterValue other = (MatrixCombinationsParameterValue)obj;
