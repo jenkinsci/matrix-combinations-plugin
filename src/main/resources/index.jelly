@@ -1,6 +1,7 @@
 <!--
   This view is used to render the plugin list page.
 -->
+<?jelly escape-by-default='true'?>
 <div>
   Adds a new parameter type called Matrix Combinations Parameter which allows the user to choose which matrix combinations he wants to run
 </div>
