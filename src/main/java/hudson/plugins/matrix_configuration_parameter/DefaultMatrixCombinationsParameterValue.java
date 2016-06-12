@@ -75,6 +75,9 @@ public class DefaultMatrixCombinationsParameterValue extends MatrixCombinationsP
     
     @Override
     public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
         if (this == obj) {
             return true;
         }
@@ -88,6 +91,11 @@ public class DefaultMatrixCombinationsParameterValue extends MatrixCombinationsP
         }
         
         return combinationFilter.equals(other.combinationFilter);
+    }
+    
+    @Override
+    public int hashCode() {
+        return (combinationFilter != null) ? combinationFilter.hashCode() : 0;
     }
     
     @Override

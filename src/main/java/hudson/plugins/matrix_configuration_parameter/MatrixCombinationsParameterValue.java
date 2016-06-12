@@ -23,11 +23,16 @@
  */
 package hudson.plugins.matrix_configuration_parameter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import hudson.matrix.AxisList;
 import hudson.matrix.Combination;
 import hudson.model.*;
 
 import hudson.util.VariableResolver;
+
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 
@@ -38,49 +43,45 @@ public class MatrixCombinationsParameterValue extends ParameterValue {
 
     @DataBoundConstructor
     public MatrixCombinationsParameterValue(String name, Boolean[] values, String[] confs) {
-        super(name, null);
-        this.values = values;
-        this.confs = confs;
+        this(name, values, confs, null);
     }
 
     public MatrixCombinationsParameterValue(String name, Boolean[] values, String[] confs, String description) {
         super(name,  description);
-        this.values = values;
-        this.confs = confs;
+        this.values = (values != null) ? values.clone() : null;
+        this.confs = (confs != null) ? confs.clone() : null;
     }
 
     public Boolean[] getValues() {
-        return values;
+        return (values != null) ? values.clone() : null;
     }
 
     public String[] getConfs() {
-        return confs;
+        return (confs != null) ? confs.clone() : null;
     }
 
     @Override
     public VariableResolver<String> createVariableResolver(AbstractBuild<?, ?> build) {
         return new VariableResolver<String>() {
             public String resolve(String name) {
+                if (!MatrixCombinationsParameterValue.this.name.equals(name)) {
+                    return null;
+                }
 
-                String parameterValue = "";
-
+                List<String> conds = new ArrayList<String>();
 
                 for (int uniqueIdIndex= 0 ; uniqueIdIndex < values.length ; uniqueIdIndex++){
                     Boolean value=values[uniqueIdIndex];
                     String conf = confs[uniqueIdIndex];
 
                     if (value.booleanValue()){
-                        parameterValue += "("+conf.replace("="," == '").replace(",","' && ")+"') || ";
+                        conds.add("("+conf.replace("="," == '").replace(",","' && ")+"')");
 
                     }
 
 
                 }
-                if (parameterValue.length()> 4){
-                    parameterValue = parameterValue.substring(0,parameterValue.length()-4);
-                }
-
-                return MatrixCombinationsParameterValue.this.name.equals(name) ? parameterValue : null;
+                return StringUtils.join(conds, " || ");
 
 
             }
@@ -119,7 +120,7 @@ public class MatrixCombinationsParameterValue extends ParameterValue {
         if (!super.equals(obj)) {
             return false;
         }
-        if (MatrixCombinationsParameterValue.class != obj.getClass()) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
         MatrixCombinationsParameterValue other = (MatrixCombinationsParameterValue)obj;
@@ -149,7 +150,7 @@ public class MatrixCombinationsParameterValue extends ParameterValue {
         valueStr.append("(MatrixCombinationsParameterValue) " + getName()+"\n");
         for (int i=0; i< values.length; i++)
         {
-            valueStr.append(String.format("%s:%s\n",confs[i],values[i]));
+            valueStr.append(String.format("%s:%s%n",confs[i],values[i]));
         }
         return valueStr.toString();
     }
