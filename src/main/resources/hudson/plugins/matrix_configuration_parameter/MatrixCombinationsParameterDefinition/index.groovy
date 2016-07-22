@@ -55,7 +55,8 @@ private void drawMainBody(MatrixCombinationsParameterDefinition paramDef, Namesp
                 "<a id=\"shortcut-" + nameIt + "-successful\" href=\"#\" onclick=\"click2Change(0);\">Successful</a> - \n" +
                 "<a id=\"shortcut-" + nameIt + "-failed\"     href=\"#\" onclick=\"click2Change(2);\">Failed</a> - \n" +
                 "<a id=\"shortcut-" + nameIt + "-all\"        href=\"#\" onclick=\"click2Change(1000);\">All</a> - \n" +
-                "<a id=\"shortcut-" + nameIt + "-none\"       href=\"#\" onclick=\"click2Change(-1);\">None</a>")
+                "<a id=\"shortcut-" + nameIt + "-none\"       href=\"#\" onclick=\"click2Change(-1);\">None</a> - \n" +
+                "<a id=\"shortcut-" + nameIt + "-previous\"   href=\"#\" onclick=\"click2Change(-10);\">Previous</a>")
 
         }//div
     }
@@ -71,8 +72,19 @@ private void drawMainLinksJS(String nameIt) {
             "var element = document.parameters.elements[i];\n" +
             "if( element.type == 'checkbox' && element.id.lastIndexOf(\"checkbox" + nameIt + "-\", 0) == 0 )\n" +
             "{\n" +
-            "if( (document.parameters.elements[i+1].getAttribute('data-status') == status) || status > 999 )\n" +
-
+            "if( status == 1000 )\n" +
+            "{\n" +
+            "element.checked = true;\n" +
+            "}\n" +
+            "else if( status == -1 )\n" +
+            "{\n" +
+            "element.checked = false;\n" +
+            "}\n" +
+            "else if( status == -10 && document.parameters.elements[i+1].getAttribute('previous-build') == 'true' )\n" +
+            "{\n" +
+            "element.checked = true;\n" +
+            "}\n" +
+            "else if( (document.parameters.elements[i+1].getAttribute('data-status') == status) )\n" +
             "{\n" +
             "element.checked = true;\n" +
             "}\n" +
@@ -103,6 +115,7 @@ private int encodeRunResult(MatrixRun run) {
 private void drawMainBall(MatrixCombinationsParameterDefinition paramDef, Combination combination,AxisList axes,String matrixName,MatrixProject project,Layouter layouter) {
 
     lastBuild = project.getLastBuild();
+    isPreviousRun = false;
     if (lastBuild != null && lastBuild.getRun(combination)!=null){
         lastRun = lastBuild.getRun(combination);
         if (lastRun != null){
@@ -114,7 +127,10 @@ private void drawMainBall(MatrixCombinationsParameterDefinition paramDef, Combin
             }
             checked = combination.evalGroovyExpression(axes, paramDef.defaultCombinationFilter?:project.combinationFilter)
             f.checkbox(checked: checked, name: "values",id: String.format("checkbox%s-%s", matrixName, combination.toString('-' as char, '-' as char)))
-            input(type: "hidden", name: "confs", value: combination.toString(),'data-status':encodeRunResult(lastRun))
+            if (lastRun.getParentBuild() == lastBuild) {
+                isPreviousRun = true
+            }
+            input(type: "hidden", name: "confs", value: combination.toString(),'data-status':encodeRunResult(lastRun), 'previous-build':isPreviousRun)
 
         }
 
@@ -126,7 +142,7 @@ private void drawMainBall(MatrixCombinationsParameterDefinition paramDef, Combin
         
         checked = combination.evalGroovyExpression(axes, paramDef.defaultCombinationFilter?:project.combinationFilter)
         f.checkbox(checked: checked, name: "values",id: String.format("checkbox%s-%s", matrixName, combination.toString('-' as char, '-' as char)))
-        input(type: "hidden", name: "confs", value: combination.toString(), 'data-status': -1)
+        input(type: "hidden", name: "confs", value: combination.toString(), 'data-status': -1, 'previous-run':isPreviousRun)
     }
 
 }
