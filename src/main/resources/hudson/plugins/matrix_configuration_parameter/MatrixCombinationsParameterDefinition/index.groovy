@@ -126,7 +126,7 @@ private void drawMainBall(MatrixCombinationsParameterDefinition paramDef, Combin
         
         checked = combination.evalGroovyExpression(axes, paramDef.defaultCombinationFilter?:project.combinationFilter)
         f.checkbox(checked: checked, name: "values",id: String.format("checkbox%s-%s", matrixName, combination.toString('-' as char, '-' as char)))
-        input(type: "hidden", name: "confs", value: combination.toString(), 'data-status': combination.toIndex((AxisList) axes) != -1 ? 0 : -1)
+        input(type: "hidden", name: "confs", value: combination.toString(), 'data-status': -1)
     }
 
 }
