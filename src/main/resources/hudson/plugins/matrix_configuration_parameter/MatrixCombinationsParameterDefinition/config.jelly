@@ -35,5 +35,11 @@ THE SOFTWARE.
         <f:entry field="defaultCombinationFilter" title="${%Default Filter}">
           <f:textbox />
         </f:entry>
+        <f:entry field="shortcutList" title="${%Shortcut links}">
+          <f:hetero-list name="shortcutList" hasHeader="true"
+            descriptors="${descriptor.shortcutDescriptorList}"
+            items="${(instance != null) ? instance.shortcutList : descriptor.defaultShortcutList}"
+            addCaption="${%Add Shortcut link}" />
+        </f:entry>
     </f:advanced>
 </j:jelly>

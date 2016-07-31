@@ -26,8 +26,14 @@ package hudson.plugins.matrix_configuration_parameter;
 import hudson.Extension;
 import hudson.model.ParameterDefinition;
 import hudson.model.ParameterValue;
-
+import hudson.plugins.matrix_configuration_parameter.shortcut.MatrixCombinationsShortcut;
+import hudson.plugins.matrix_configuration_parameter.shortcut.MatrixCombinationsShortcutDescriptor;
 import net.sf.json.JSONObject;
+
+import java.util.Arrays;
+import java.util.List;
+
+import javax.annotation.Nonnull;
 
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -38,6 +44,7 @@ public class MatrixCombinationsParameterDefinition extends ParameterDefinition {
 
     private static final long serialVersionUID = 1L;
     private final String defaultCombinationFilter;
+    private final List<MatrixCombinationsShortcut> shortcutList;
 
     /**
      * @return groovy expression to specify default checked combinations
@@ -46,14 +53,58 @@ public class MatrixCombinationsParameterDefinition extends ParameterDefinition {
         return defaultCombinationFilter;
     }
 
+    /**
+     * @return list of shortcuts
+     * @since 1.1.0
+     */
+    @Nonnull
+    public List<MatrixCombinationsShortcut> getShortcutList() {
+        return shortcutList;
+    }
+
+    /**
+     * @return list of shortcuts that should be used as defaults
+     * @since 1.1.0
+     */
+    public static List<MatrixCombinationsShortcut> getDefaultShortcutList() {
+        return Arrays.asList(
+            new MatrixCombinationsShortcut.Successful(),
+            new MatrixCombinationsShortcut.Failed(),
+            new MatrixCombinationsShortcut.All(),
+            new MatrixCombinationsShortcut.None()
+        );
+    }
+
+    /**
+     * ctor
+     *
+     * @param name the name of the parameter
+     * @param description the description for the parameter
+     * @param defaultCombinationFilter combinations filter to used to calculate default checks
+     * @param shortcutList the list of shortcuts to display
+     * @since 1.1.0
+     */
     @DataBoundConstructor
-    public MatrixCombinationsParameterDefinition(String name, String description, String defaultCombinationFilter) {
+    public MatrixCombinationsParameterDefinition(String name, String description, String defaultCombinationFilter, List<MatrixCombinationsShortcut> shortcutList) {
         super(name, description);
         this.defaultCombinationFilter = !StringUtils.isBlank(defaultCombinationFilter)?defaultCombinationFilter:null;
+        this.shortcutList = (shortcutList != null) ? shortcutList : getDefaultShortcutList();
+    }
+
+    public MatrixCombinationsParameterDefinition(String name, String description, String defaultCombinationFilter) {
+        this(name, description, defaultCombinationFilter, getDefaultShortcutList());
     }
 
     public MatrixCombinationsParameterDefinition(String name, String description) {
         this(name, description, null);
+    }
+
+    private Object readResolve() {
+        if (this.shortcutList == null) {
+            // the one from < 1.1.0
+            return new MatrixCombinationsParameterDefinition(getName(), getDescription(), getDefaultCombinationFilter());
+        }
+        return this;
     }
 
     @Override
@@ -97,7 +148,17 @@ public class MatrixCombinationsParameterDefinition extends ParameterDefinition {
             return "/plugin/matrix-configuration-parameter/help.html";
         }
 
-
+        /**
+         * @return list of shortcuts that should be used as defaults
+         * @since 1.1.0
+         */
+        public List<MatrixCombinationsShortcut> getDefaultShortcutList() {
+            return MatrixCombinationsParameterDefinition.getDefaultShortcutList();
+        }
+        
+        public List<MatrixCombinationsShortcutDescriptor> getShortcutDescriptorList() {
+            return MatrixCombinationsShortcutDescriptor.all();
+        }
     }
 
 }
