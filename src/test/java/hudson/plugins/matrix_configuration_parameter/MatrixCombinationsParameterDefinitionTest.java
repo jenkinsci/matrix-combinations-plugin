@@ -34,6 +34,7 @@ import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.ParametersDefinitionProperty;
 import hudson.model.queue.QueueTaskFuture;
+import hudson.plugins.matrix_configuration_parameter.shortcut.MatrixCombinationsShortcut;
 import hudson.model.Result;
 
 import org.junit.Rule;
@@ -173,9 +174,18 @@ public class MatrixCombinationsParameterDefinitionTest {
         HtmlPage page = wc.getPage(p, "build");
         HtmlForm form = page.getFormByName("parameters");
         
-        ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1")).setChecked(true);
-        ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value2")).setChecked(false);
-        ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value3")).setChecked(true);
+        page.<HtmlCheckBoxInput>selectNodes(String.format(
+            "//*[@data-combination='%s']//input[@type='checkbox']",
+            new Combination(axes, "value1").toIndex(axes)
+        )).get(0).setChecked(true);
+        page.<HtmlCheckBoxInput>selectNodes(String.format(
+            "//*[@data-combination='%s']//input[@type='checkbox']",
+            new Combination(axes, "value2").toIndex(axes)
+        )).get(0).setChecked(false);
+        page.<HtmlCheckBoxInput>selectNodes(String.format(
+            "//*[@data-combination='%s']//input[@type='checkbox']",
+            new Combination(axes, "value3").toIndex(axes)
+        )).get(0).setChecked(true);
         
         j.submit(form);
         
@@ -214,57 +224,165 @@ public class MatrixCombinationsParameterDefinitionTest {
         
         // Successful link
         {
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1")).setChecked(false);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value2")).setChecked(true);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value3")).setChecked(true);
+            page.<HtmlCheckBoxInput>selectNodes(String.format(
+                "//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, "value1").toIndex(axes)
+            )).get(0).setChecked(false);
+            page.<HtmlCheckBoxInput>selectNodes(String.format(
+                "//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, "value2").toIndex(axes)
+            )).get(0).setChecked(true);
+            page.<HtmlCheckBoxInput>selectNodes(String.format(
+                "//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, "value3").toIndex(axes)
+            )).get(0).setChecked(true);
             
-            ((HtmlAnchor)page.getElementById("shortcut-combinations-successful")).click();
+            page.<HtmlAnchor>selectNodes(String.format(
+                "//a[contains(@class, '%s')]",
+                new MatrixCombinationsShortcut.Successful().getLinkId()
+            )).get(0).click();
             
-            assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1")).isChecked());
-            assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value2")).isChecked());
-            assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value3")).isChecked());
+            assertTrue(
+                page.<HtmlCheckBoxInput>selectNodes(String.format(
+                    "//*[@data-combination='%s']//input[@type='checkbox']",
+                    new Combination(axes, "value1").toIndex(axes)
+                )).get(0).isChecked()
+            );
+            assertFalse(
+                page.<HtmlCheckBoxInput>selectNodes(String.format(
+                    "//*[@data-combination='%s']//input[@type='checkbox']",
+                    new Combination(axes, "value2").toIndex(axes)
+                )).get(0).isChecked()
+            );
+            assertTrue(
+                page.<HtmlCheckBoxInput>selectNodes(String.format(
+                    "//*[@data-combination='%s']//input[@type='checkbox']",
+                    new Combination(axes, "value3").toIndex(axes)
+                )).get(0).isChecked()
+            );
             
         }
  
         // Failed link
         {
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1")).setChecked(true);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value2")).setChecked(false);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value3")).setChecked(false);
+            page.<HtmlCheckBoxInput>selectNodes(String.format(
+                "//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, "value1").toIndex(axes)
+            )).get(0).setChecked(true);
+            page.<HtmlCheckBoxInput>selectNodes(String.format(
+                "//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, "value2").toIndex(axes)
+            )).get(0).setChecked(false);
+            page.<HtmlCheckBoxInput>selectNodes(String.format(
+                "//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, "value3").toIndex(axes)
+            )).get(0).setChecked(false);
             
-            ((HtmlAnchor)page.getElementById("shortcut-combinations-failed")).click();
+            page.<HtmlAnchor>selectNodes(String.format(
+                "//a[contains(@class, '%s')]",
+                new MatrixCombinationsShortcut.Failed().getLinkId()
+            )).get(0).click();
             
-            assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1")).isChecked());
-            assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value2")).isChecked());
-            assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value3")).isChecked());
+            assertFalse(
+                page.<HtmlCheckBoxInput>selectNodes(String.format(
+                    "//*[@data-combination='%s']//input[@type='checkbox']",
+                    new Combination(axes, "value1").toIndex(axes)
+                )).get(0).isChecked()
+            );
+            assertTrue(
+                page.<HtmlCheckBoxInput>selectNodes(String.format(
+                    "//*[@data-combination='%s']//input[@type='checkbox']",
+                    new Combination(axes, "value2").toIndex(axes)
+                )).get(0).isChecked()
+            );
+            assertFalse(
+                page.<HtmlCheckBoxInput>selectNodes(String.format(
+                    "//*[@data-combination='%s']//input[@type='checkbox']",
+                    new Combination(axes, "value3").toIndex(axes)
+                )).get(0).isChecked()
+            );
             
         }
         
         // All link
         {
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1")).setChecked(false);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value2")).setChecked(false);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value3")).setChecked(true);
+            page.<HtmlCheckBoxInput>selectNodes(String.format(
+                "//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, "value1").toIndex(axes)
+            )).get(0).setChecked(false);
+            page.<HtmlCheckBoxInput>selectNodes(String.format(
+                "//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, "value2").toIndex(axes)
+            )).get(0).setChecked(false);
+            page.<HtmlCheckBoxInput>selectNodes(String.format(
+                "//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, "value3").toIndex(axes)
+            )).get(0).setChecked(true);
             
-            ((HtmlAnchor)page.getElementById("shortcut-combinations-all")).click();
+            page.<HtmlAnchor>selectNodes(String.format(
+                "//a[contains(@class, '%s')]",
+                new MatrixCombinationsShortcut.All().getLinkId()
+            )).get(0).click();
             
-            assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1")).isChecked());
-            assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value2")).isChecked());
-            assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value3")).isChecked());
+            assertTrue(
+                page.<HtmlCheckBoxInput>selectNodes(String.format(
+                    "//*[@data-combination='%s']//input[@type='checkbox']",
+                    new Combination(axes, "value1").toIndex(axes)
+                )).get(0).isChecked()
+            );
+            assertTrue(
+                page.<HtmlCheckBoxInput>selectNodes(String.format(
+                    "//*[@data-combination='%s']//input[@type='checkbox']",
+                    new Combination(axes, "value2").toIndex(axes)
+                )).get(0).isChecked()
+            );
+            assertTrue(
+                page.<HtmlCheckBoxInput>selectNodes(String.format(
+                    "//*[@data-combination='%s']//input[@type='checkbox']",
+                    new Combination(axes, "value3").toIndex(axes)
+                )).get(0).isChecked()
+            );
             
         }
         
         // None link
         {
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1")).setChecked(true);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value2")).setChecked(true);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value3")).setChecked(false);
+            page.<HtmlCheckBoxInput>selectNodes(String.format(
+                "//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, "value1").toIndex(axes)
+            )).get(0).setChecked(true);
+            page.<HtmlCheckBoxInput>selectNodes(String.format(
+                "//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, "value2").toIndex(axes)
+            )).get(0).setChecked(true);
+            page.<HtmlCheckBoxInput>selectNodes(String.format(
+                "//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, "value3").toIndex(axes)
+            )).get(0).setChecked(false);
             
-            ((HtmlAnchor)page.getElementById("shortcut-combinations-none")).click();
+            page.<HtmlAnchor>selectNodes(String.format(
+                "//a[contains(@class, '%s')]",
+                new MatrixCombinationsShortcut.None().getLinkId()
+            )).get(0).click();
             
-            assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1")).isChecked());
-            assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value2")).isChecked());
-            assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value3")).isChecked());
+            assertFalse(
+                page.<HtmlCheckBoxInput>selectNodes(String.format(
+                    "//*[@data-combination='%s']//input[@type='checkbox']",
+                    new Combination(axes, "value1").toIndex(axes)
+                )).get(0).isChecked()
+            );
+            assertFalse(
+                page.<HtmlCheckBoxInput>selectNodes(String.format(
+                    "//*[@data-combination='%s']//input[@type='checkbox']",
+                    new Combination(axes, "value2").toIndex(axes)
+                )).get(0).isChecked()
+            );
+            assertFalse(
+                page.<HtmlCheckBoxInput>selectNodes(String.format(
+                    "//*[@data-combination='%s']//input[@type='checkbox']",
+                    new Combination(axes, "value3").toIndex(axes)
+                )).get(0).isChecked()
+            );
             
         }
     }
@@ -286,10 +404,22 @@ public class MatrixCombinationsParameterDefinitionTest {
         HtmlPage page = wc.getPage(p, "build");
         HtmlForm form = page.getFormByName("parameters");
         
-        ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-1")).setChecked(false);
-        ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-2")).setChecked(true);
-        ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-1")).setChecked(true);
-        ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-2")).setChecked(false);
+        page.<HtmlCheckBoxInput>selectNodes(String.format(
+            "//*[@data-combination='%s']//input[@type='checkbox']",
+            new Combination(axes, "value1-1", "value2-1").toIndex(axes)
+        )).get(0).setChecked(false);
+        page.<HtmlCheckBoxInput>selectNodes(String.format(
+            "//*[@data-combination='%s']//input[@type='checkbox']",
+            new Combination(axes, "value1-1", "value2-2").toIndex(axes)
+        )).get(0).setChecked(true);
+        page.<HtmlCheckBoxInput>selectNodes(String.format(
+            "//*[@data-combination='%s']//input[@type='checkbox']",
+            new Combination(axes, "value1-2", "value2-1").toIndex(axes)
+        )).get(0).setChecked(true);
+        page.<HtmlCheckBoxInput>selectNodes(String.format(
+            "//*[@data-combination='%s']//input[@type='checkbox']",
+            new Combination(axes, "value1-2", "value2-2").toIndex(axes)
+        )).get(0).setChecked(false);
         
         j.submit(form);
         
@@ -334,62 +464,202 @@ public class MatrixCombinationsParameterDefinitionTest {
         
         // Successful link
         {
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-1")).setChecked(true);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-2")).setChecked(false);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-1")).setChecked(true);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-2")).setChecked(false);
+            page.<HtmlCheckBoxInput>selectNodes(String.format(
+                "//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, "value1-1", "value2-1").toIndex(axes)
+            )).get(0).setChecked(true);
+            page.<HtmlCheckBoxInput>selectNodes(String.format(
+                "//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, "value1-1", "value2-2").toIndex(axes)
+            )).get(0).setChecked(false);
+            page.<HtmlCheckBoxInput>selectNodes(String.format(
+                "//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, "value1-2", "value2-1").toIndex(axes)
+            )).get(0).setChecked(true);
+            page.<HtmlCheckBoxInput>selectNodes(String.format(
+                "//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, "value1-2", "value2-2").toIndex(axes)
+            )).get(0).setChecked(false);
             
-            ((HtmlAnchor)page.getElementById("shortcut-combinations-successful")).click();
+            page.<HtmlAnchor>selectNodes(String.format(
+                "//a[contains(@class, '%s')]",
+                new MatrixCombinationsShortcut.Successful().getLinkId()
+            )).get(0).click();
             
-            assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-1")).isChecked());
-            assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-2")).isChecked());
-            assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-1")).isChecked());
-            assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-2")).isChecked());
+            assertTrue(
+                page.<HtmlCheckBoxInput>selectNodes(String.format(
+                    "//*[@data-combination='%s']//input[@type='checkbox']",
+                    new Combination(axes, "value1-1", "value2-1").toIndex(axes)
+                )).get(0).isChecked()
+            );
+            assertFalse(
+                page.<HtmlCheckBoxInput>selectNodes(String.format(
+                    "//*[@data-combination='%s']//input[@type='checkbox']",
+                    new Combination(axes, "value1-1", "value2-2").toIndex(axes)
+                )).get(0).isChecked()
+            );
+            assertTrue(
+                page.<HtmlCheckBoxInput>selectNodes(String.format(
+                    "//*[@data-combination='%s']//input[@type='checkbox']",
+                    new Combination(axes, "value1-2", "value2-1").toIndex(axes)
+                )).get(0).isChecked()
+            );
+            assertTrue(
+                page.<HtmlCheckBoxInput>selectNodes(String.format(
+                    "//*[@data-combination='%s']//input[@type='checkbox']",
+                    new Combination(axes, "value1-2", "value2-2").toIndex(axes)
+                )).get(0).isChecked()
+            );
         }
         
         // Failed link
         {
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-1")).setChecked(false);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-2")).setChecked(true);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-1")).setChecked(false);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-2")).setChecked(true);
+            page.<HtmlCheckBoxInput>selectNodes(String.format(
+                "//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, "value1-1", "value2-1").toIndex(axes)
+            )).get(0).setChecked(false);
+            page.<HtmlCheckBoxInput>selectNodes(String.format(
+                "//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, "value1-1", "value2-2").toIndex(axes)
+            )).get(0).setChecked(true);
+            page.<HtmlCheckBoxInput>selectNodes(String.format(
+                "//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, "value1-2", "value2-1").toIndex(axes)
+            )).get(0).setChecked(false);
+            page.<HtmlCheckBoxInput>selectNodes(String.format(
+                "//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, "value1-2", "value2-2").toIndex(axes)
+            )).get(0).setChecked(true);
             
-            ((HtmlAnchor)page.getElementById("shortcut-combinations-failed")).click();
+            page.<HtmlAnchor>selectNodes(String.format(
+                "//a[contains(@class, '%s')]",
+                new MatrixCombinationsShortcut.Failed().getLinkId()
+            )).get(0).click();
             
-            assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-1")).isChecked());
-            assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-2")).isChecked());
-            assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-1")).isChecked());
-            assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-2")).isChecked());
+            assertFalse(
+                page.<HtmlCheckBoxInput>selectNodes(String.format(
+                    "//*[@data-combination='%s']//input[@type='checkbox']",
+                    new Combination(axes, "value1-1", "value2-1").toIndex(axes)
+                )).get(0).isChecked()
+            );
+            assertTrue(
+                page.<HtmlCheckBoxInput>selectNodes(String.format(
+                    "//*[@data-combination='%s']//input[@type='checkbox']",
+                    new Combination(axes, "value1-1", "value2-2").toIndex(axes)
+                )).get(0).isChecked()
+            );
+            assertFalse(
+                page.<HtmlCheckBoxInput>selectNodes(String.format(
+                    "//*[@data-combination='%s']//input[@type='checkbox']",
+                    new Combination(axes, "value1-2", "value2-1").toIndex(axes)
+                )).get(0).isChecked()
+            );
+            assertFalse(
+                page.<HtmlCheckBoxInput>selectNodes(String.format(
+                    "//*[@data-combination='%s']//input[@type='checkbox']",
+                    new Combination(axes, "value1-2", "value2-2").toIndex(axes)
+                )).get(0).isChecked()
+            );
         }
         
         // All link
         {
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-1")).setChecked(false);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-2")).setChecked(true);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-1")).setChecked(false);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-2")).setChecked(true);
+            page.<HtmlCheckBoxInput>selectNodes(String.format(
+                "//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, "value1-1", "value2-1").toIndex(axes)
+            )).get(0).setChecked(false);
+            page.<HtmlCheckBoxInput>selectNodes(String.format(
+                "//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, "value1-1", "value2-2").toIndex(axes)
+            )).get(0).setChecked(true);
+            page.<HtmlCheckBoxInput>selectNodes(String.format(
+                "//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, "value1-2", "value2-1").toIndex(axes)
+            )).get(0).setChecked(false);
+            page.<HtmlCheckBoxInput>selectNodes(String.format(
+                "//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, "value1-2", "value2-2").toIndex(axes)
+            )).get(0).setChecked(true);
             
-            ((HtmlAnchor)page.getElementById("shortcut-combinations-all")).click();
+            page.<HtmlAnchor>selectNodes(String.format(
+                "//a[contains(@class, '%s')]",
+                new MatrixCombinationsShortcut.All().getLinkId()
+            )).get(0).click();
             
-            assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-1")).isChecked());
-            assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-2")).isChecked());
-            assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-1")).isChecked());
-            assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-2")).isChecked());
+            assertTrue(
+                page.<HtmlCheckBoxInput>selectNodes(String.format(
+                    "//*[@data-combination='%s']//input[@type='checkbox']",
+                    new Combination(axes, "value1-1", "value2-1").toIndex(axes)
+                )).get(0).isChecked()
+            );
+            assertTrue(
+                page.<HtmlCheckBoxInput>selectNodes(String.format(
+                    "//*[@data-combination='%s']//input[@type='checkbox']",
+                    new Combination(axes, "value1-1", "value2-2").toIndex(axes)
+                )).get(0).isChecked()
+            );
+            assertTrue(
+                page.<HtmlCheckBoxInput>selectNodes(String.format(
+                    "//*[@data-combination='%s']//input[@type='checkbox']",
+                    new Combination(axes, "value1-2", "value2-1").toIndex(axes)
+                )).get(0).isChecked()
+            );
+            assertTrue(
+                page.<HtmlCheckBoxInput>selectNodes(String.format(
+                    "//*[@data-combination='%s']//input[@type='checkbox']",
+                    new Combination(axes, "value1-2", "value2-2").toIndex(axes)
+                )).get(0).isChecked()
+            );
         }
         
         // None link
         {
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-1")).setChecked(false);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-2")).setChecked(true);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-1")).setChecked(false);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-2")).setChecked(true);
+            page.<HtmlCheckBoxInput>selectNodes(String.format(
+                "//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, "value1-1", "value2-1").toIndex(axes)
+            )).get(0).setChecked(false);
+            page.<HtmlCheckBoxInput>selectNodes(String.format(
+                "//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, "value1-1", "value2-2").toIndex(axes)
+            )).get(0).setChecked(true);
+            page.<HtmlCheckBoxInput>selectNodes(String.format(
+                "//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, "value1-2", "value2-1").toIndex(axes)
+            )).get(0).setChecked(false);
+            page.<HtmlCheckBoxInput>selectNodes(String.format(
+                "//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, "value1-2", "value2-2").toIndex(axes)
+            )).get(0).setChecked(true);
             
-            ((HtmlAnchor)page.getElementById("shortcut-combinations-none")).click();
+            page.<HtmlAnchor>selectNodes(String.format(
+                "//a[contains(@class, '%s')]",
+                new MatrixCombinationsShortcut.None().getLinkId()
+            )).get(0).click();
             
-            assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-1")).isChecked());
-            assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-2")).isChecked());
-            assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-1")).isChecked());
-            assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-2")).isChecked());
+            assertFalse(
+                page.<HtmlCheckBoxInput>selectNodes(String.format(
+                    "//*[@data-combination='%s']//input[@type='checkbox']",
+                    new Combination(axes, "value1-1", "value2-1").toIndex(axes)
+                )).get(0).isChecked()
+            );
+            assertFalse(
+                page.<HtmlCheckBoxInput>selectNodes(String.format(
+                    "//*[@data-combination='%s']//input[@type='checkbox']",
+                    new Combination(axes, "value1-1", "value2-2").toIndex(axes)
+                )).get(0).isChecked()
+            );
+            assertFalse(
+                page.<HtmlCheckBoxInput>selectNodes(String.format(
+                    "//*[@data-combination='%s']//input[@type='checkbox']",
+                    new Combination(axes, "value1-2", "value2-1").toIndex(axes)
+                )).get(0).isChecked()
+            );
+            assertFalse(
+                page.<HtmlCheckBoxInput>selectNodes(String.format(
+                    "//*[@data-combination='%s']//input[@type='checkbox']",
+                    new Combination(axes, "value1-2", "value2-2").toIndex(axes)
+                )).get(0).isChecked()
+            );
         }
     }
     

@@ -101,7 +101,7 @@ public abstract class MatrixCombinationsShortcut
      * @return name used to distinguish links.
      */
     public String getLinkId() {
-        return getDescriptor().getJsonSafeClassName();
+        return getDescriptor().getId().replace('.', '-').replace('$', '-');
     }
 
     /**
@@ -197,8 +197,7 @@ public abstract class MatrixCombinationsShortcut
                         public boolean apply(MatrixRun r) {
                             Result result = r.getResult();
                             return (result != null)
-                                && result.isWorseThan(Result.SUCCESS)
-                                && result.isBetterOrEqualTo(Result.UNSTABLE);
+                                && result.isWorseThan(Result.UNSTABLE);
                         }
                     }
                 ),
