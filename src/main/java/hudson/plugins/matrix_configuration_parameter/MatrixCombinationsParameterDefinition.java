@@ -41,11 +41,14 @@ import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 
 public class MatrixCombinationsParameterDefinition extends ParameterDefinition {
 
     private static final long serialVersionUID = 1L;
     private final String defaultCombinationFilter;
+    @SuppressFBWarnings(value="SE_BAD_FIELD")
     private final List<MatrixCombinationsShortcut> shortcutList;
 
     /**
