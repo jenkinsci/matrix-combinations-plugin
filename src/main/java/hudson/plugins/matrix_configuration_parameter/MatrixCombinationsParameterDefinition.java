@@ -26,8 +26,10 @@ package hudson.plugins.matrix_configuration_parameter;
 import hudson.Extension;
 import hudson.model.ParameterDefinition;
 import hudson.model.ParameterValue;
+import hudson.model.Result;
 import hudson.plugins.matrix_configuration_parameter.shortcut.MatrixCombinationsShortcut;
 import hudson.plugins.matrix_configuration_parameter.shortcut.MatrixCombinationsShortcutDescriptor;
+import hudson.plugins.matrix_configuration_parameter.shortcut.ResultShortcut;
 import net.sf.json.JSONObject;
 
 import java.util.Arrays;
@@ -68,8 +70,8 @@ public class MatrixCombinationsParameterDefinition extends ParameterDefinition {
      */
     public static List<MatrixCombinationsShortcut> getDefaultShortcutList() {
         return Arrays.asList(
-            new MatrixCombinationsShortcut.Successful(),
-            new MatrixCombinationsShortcut.Failed(),
+            new ResultShortcut("Successful", false, Result.SUCCESS),
+            new ResultShortcut("Failed", false, Result.FAILURE),
             new MatrixCombinationsShortcut.All(),
             new MatrixCombinationsShortcut.None()
         );

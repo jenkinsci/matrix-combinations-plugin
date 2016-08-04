@@ -62,7 +62,7 @@ private void drawMainBody(MatrixCombinationsParameterDefinition paramDef, Namesp
             }
             span(style: "font-weight: bold;") { text("Select: "); }
             paramDef.shortcutList.each { shortcut ->
-                a(class: "shortcut " + shortcut.linkId, href: "#", "data-combinations": shortcut.getCombinationsData(project, build)) {
+                a(class: "shortcut shortcut-" + shortcut.id, href: "#", "data-shortcut-id": shortcut.id, "data-combinations": shortcut.getCombinationsData(project, build)) {
                     text(shortcut.name);
                 }
                 if (shortcut != paramDef.shortcutList.last()) {

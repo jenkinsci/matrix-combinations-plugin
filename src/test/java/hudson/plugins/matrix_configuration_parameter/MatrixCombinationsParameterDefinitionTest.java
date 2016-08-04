@@ -34,7 +34,6 @@ import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.ParametersDefinitionProperty;
 import hudson.model.queue.QueueTaskFuture;
-import hudson.plugins.matrix_configuration_parameter.shortcut.MatrixCombinationsShortcut;
 import hudson.model.Result;
 
 import org.junit.Rule;
@@ -220,7 +219,6 @@ public class MatrixCombinationsParameterDefinitionTest {
         }
         WebClient wc = j.createAllow405WebClient();
         HtmlPage page = wc.getPage(p, "build");
-        HtmlForm form = page.getFormByName("parameters");
         
         // Successful link
         {
@@ -237,10 +235,7 @@ public class MatrixCombinationsParameterDefinitionTest {
                 new Combination(axes, "value3").toIndex(axes)
             )).get(0).setChecked(true);
             
-            page.<HtmlAnchor>selectNodes(String.format(
-                "//a[contains(@class, '%s')]",
-                new MatrixCombinationsShortcut.Successful().getLinkId()
-            )).get(0).click();
+            page.<HtmlAnchor>selectNodes("//a[@data-shortcut-id='SUCCESS']").get(0).click();
             
             assertTrue(
                 page.<HtmlCheckBoxInput>selectNodes(String.format(
@@ -278,10 +273,7 @@ public class MatrixCombinationsParameterDefinitionTest {
                 new Combination(axes, "value3").toIndex(axes)
             )).get(0).setChecked(false);
             
-            page.<HtmlAnchor>selectNodes(String.format(
-                "//a[contains(@class, '%s')]",
-                new MatrixCombinationsShortcut.Failed().getLinkId()
-            )).get(0).click();
+            page.<HtmlAnchor>selectNodes("//a[@data-shortcut-id='FAILURE']").get(0).click();
             
             assertFalse(
                 page.<HtmlCheckBoxInput>selectNodes(String.format(
@@ -319,10 +311,7 @@ public class MatrixCombinationsParameterDefinitionTest {
                 new Combination(axes, "value3").toIndex(axes)
             )).get(0).setChecked(true);
             
-            page.<HtmlAnchor>selectNodes(String.format(
-                "//a[contains(@class, '%s')]",
-                new MatrixCombinationsShortcut.All().getLinkId()
-            )).get(0).click();
+            page.<HtmlAnchor>selectNodes("//a[@data-shortcut-id='All']").get(0).click();
             
             assertTrue(
                 page.<HtmlCheckBoxInput>selectNodes(String.format(
@@ -360,10 +349,7 @@ public class MatrixCombinationsParameterDefinitionTest {
                 new Combination(axes, "value3").toIndex(axes)
             )).get(0).setChecked(false);
             
-            page.<HtmlAnchor>selectNodes(String.format(
-                "//a[contains(@class, '%s')]",
-                new MatrixCombinationsShortcut.None().getLinkId()
-            )).get(0).click();
+            page.<HtmlAnchor>selectNodes("//a[@data-shortcut-id='None']").get(0).click();
             
             assertFalse(
                 page.<HtmlCheckBoxInput>selectNodes(String.format(
@@ -460,7 +446,6 @@ public class MatrixCombinationsParameterDefinitionTest {
         }
         WebClient wc = j.createAllow405WebClient();
         HtmlPage page = wc.getPage(p, "build");
-        HtmlForm form = page.getFormByName("parameters");
         
         // Successful link
         {
@@ -481,10 +466,7 @@ public class MatrixCombinationsParameterDefinitionTest {
                 new Combination(axes, "value1-2", "value2-2").toIndex(axes)
             )).get(0).setChecked(false);
             
-            page.<HtmlAnchor>selectNodes(String.format(
-                "//a[contains(@class, '%s')]",
-                new MatrixCombinationsShortcut.Successful().getLinkId()
-            )).get(0).click();
+            page.<HtmlAnchor>selectNodes("//a[@data-shortcut-id='SUCCESS']").get(0).click();
             
             assertTrue(
                 page.<HtmlCheckBoxInput>selectNodes(String.format(
@@ -531,10 +513,7 @@ public class MatrixCombinationsParameterDefinitionTest {
                 new Combination(axes, "value1-2", "value2-2").toIndex(axes)
             )).get(0).setChecked(true);
             
-            page.<HtmlAnchor>selectNodes(String.format(
-                "//a[contains(@class, '%s')]",
-                new MatrixCombinationsShortcut.Failed().getLinkId()
-            )).get(0).click();
+            page.<HtmlAnchor>selectNodes("//a[@data-shortcut-id='FAILURE']").get(0).click();
             
             assertFalse(
                 page.<HtmlCheckBoxInput>selectNodes(String.format(
@@ -581,10 +560,7 @@ public class MatrixCombinationsParameterDefinitionTest {
                 new Combination(axes, "value1-2", "value2-2").toIndex(axes)
             )).get(0).setChecked(true);
             
-            page.<HtmlAnchor>selectNodes(String.format(
-                "//a[contains(@class, '%s')]",
-                new MatrixCombinationsShortcut.All().getLinkId()
-            )).get(0).click();
+            page.<HtmlAnchor>selectNodes("//a[@data-shortcut-id='All']").get(0).click();
             
             assertTrue(
                 page.<HtmlCheckBoxInput>selectNodes(String.format(
@@ -631,10 +607,7 @@ public class MatrixCombinationsParameterDefinitionTest {
                 new Combination(axes, "value1-2", "value2-2").toIndex(axes)
             )).get(0).setChecked(true);
             
-            page.<HtmlAnchor>selectNodes(String.format(
-                "//a[contains(@class, '%s')]",
-                new MatrixCombinationsShortcut.None().getLinkId()
-            )).get(0).click();
+            page.<HtmlAnchor>selectNodes("//a[@data-shortcut-id='None']").get(0).click();
             
             assertFalse(
                 page.<HtmlCheckBoxInput>selectNodes(String.format(

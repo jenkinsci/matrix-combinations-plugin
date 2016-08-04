@@ -34,7 +34,6 @@ import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 
 import hudson.Extension;
@@ -43,9 +42,7 @@ import hudson.matrix.Combination;
 import hudson.matrix.MatrixBuild;
 import hudson.matrix.MatrixConfiguration;
 import hudson.matrix.MatrixProject;
-import hudson.matrix.MatrixRun;
 import hudson.model.AbstractDescribableImpl;
-import hudson.model.Result;
 
 /**
  * Defines shortcut link to select a set of axes combinations.
@@ -93,16 +90,14 @@ public abstract class MatrixCombinationsShortcut
     /**
      * @return name used for the link text.
      */
-    public String getName() {
-        return getDescriptor().getDisplayName();
-    }
+    @Nonnull
+    public abstract String getName();
 
     /**
      * @return name used to distinguish links.
      */
-    public String getLinkId() {
-        return getDescriptor().getId().replace('.', '-').replace('$', '-');
-    }
+    @Nonnull
+    public abstract String getId();
 
     /**
      * {@inheritDoc}
@@ -110,118 +105,6 @@ public abstract class MatrixCombinationsShortcut
     @Override
     public MatrixCombinationsShortcutDescriptor getDescriptor() {
         return (MatrixCombinationsShortcutDescriptor)super.getDescriptor();
-    }
-
-    /**
-     * Checks all combinations with successful builds.
-     */
-    public static class Successful extends MatrixCombinationsShortcut {
-        /**
-         * ctor
-         */
-        @DataBoundConstructor
-        public Successful() {
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Collection<Combination> getCombinations(
-            @Nonnull MatrixProject project,
-            @CheckForNull MatrixBuild build
-        ) {
-            if (build == null) {
-                return Collections.emptyList();
-            }
-            return Collections2.transform(
-                Collections2.filter(
-                    build.getRuns(),
-                    new Predicate<MatrixRun>() {
-                        public boolean apply(MatrixRun r) {
-                            Result result = r.getResult();
-                            return (result != null)
-                                && result.isBetterOrEqualTo(Result.SUCCESS);
-                        }
-                    }
-                ),
-                new Function<MatrixRun, Combination>() {
-                    public Combination apply(MatrixRun r) {
-                        return r.getParent().getCombination();
-                    }
-                }
-            );
-        }
-
-        /**
-         * Descriptor for {@link Successful}
-         */
-        @Extension(ordinal=140) // Top Most
-        public static class DescriptorImpl extends MatrixCombinationsShortcutDescriptor {
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public String getDisplayName() {
-                return "Successful";
-            }
-        }
-    }
-
-    /**
-     * Checks all combinations with unstable or more worse builds.
-     */
-    public static class Failed extends MatrixCombinationsShortcut {
-        /**
-         * ctor
-         */
-        @DataBoundConstructor
-        public Failed() {
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Collection<Combination> getCombinations(
-            @Nonnull MatrixProject project,
-            @CheckForNull MatrixBuild build
-        ) {
-            if (build == null) {
-                return Collections.emptyList();
-            }
-            return Collections2.transform(
-                Collections2.filter(
-                    build.getRuns(),
-                    new Predicate<MatrixRun>() {
-                        public boolean apply(MatrixRun r) {
-                            Result result = r.getResult();
-                            return (result != null)
-                                && result.isWorseThan(Result.UNSTABLE);
-                        }
-                    }
-                ),
-                new Function<MatrixRun, Combination>() {
-                    public Combination apply(MatrixRun r) {
-                        return r.getParent().getCombination();
-                    }
-                }
-            );
-        }
-
-        /**
-         * Descriptor for {@link Failed}
-         */
-        @Extension(ordinal=130) // Next to Successful
-        public static class DescriptorImpl extends MatrixCombinationsShortcutDescriptor {
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public String getDisplayName() {
-                return "Failed";
-            }
-        }
     }
 
     /**
@@ -254,9 +137,25 @@ public abstract class MatrixCombinationsShortcut
         }
 
         /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getName() {
+            return getDescriptor().getDisplayName();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getId() {
+            return "All";
+        }
+
+        /**
          * Descriptor for {@link All}
          */
-        @Extension(ordinal=120) // Next to Failed
+        @Extension(ordinal=120) // Top most
         public static class DescriptorImpl extends MatrixCombinationsShortcutDescriptor {
             /**
              * {@inheritDoc}
@@ -288,6 +187,22 @@ public abstract class MatrixCombinationsShortcut
             @CheckForNull MatrixBuild build
         ) {
             return Collections.emptyList();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getName() {
+            return getDescriptor().getDisplayName();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getId() {
+            return "None";
         }
 
         /**
