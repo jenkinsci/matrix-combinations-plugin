@@ -24,9 +24,7 @@
 
 package hudson.plugins.matrix_configuration_parameter.shortcut;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
@@ -34,8 +32,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
 
-import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
-import com.gargoylesoftware.htmlunit.html.HtmlCheckBoxInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 import hudson.matrix.AxisList;
@@ -137,26 +133,11 @@ public class ResultShortcutTest {
         WebClient wc = j.createAllow405WebClient();
         HtmlPage page = wc.getPage(p, "build");
 
-        page.<HtmlAnchor>selectNodes("//a[@data-shortcut-id='FAILURE']").get(0).click();
+        j.clickShortcut(page, "FAILURE");
 
-        assertFalse(
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value1").toIndex(axes)
-            )).get(0).isChecked()
-        );
-        assertTrue(
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value2").toIndex(axes)
-            )).get(0).isChecked()
-        );
-        assertFalse(
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value3").toIndex(axes)
-            )).get(0).isChecked()
-        );
+        j.assertCombinationChecked(page, false, axes, "value1");
+        j.assertCombinationChecked(page, true, axes, "value2");
+        j.assertCombinationChecked(page, false, axes, "value3");
     }
 
     @Test
@@ -188,26 +169,11 @@ public class ResultShortcutTest {
         WebClient wc = j.createAllow405WebClient();
         HtmlPage page = wc.getPage(p, "build");
 
-        page.<HtmlAnchor>selectNodes("//a[@data-shortcut-id='UNSTABLE-FAILURE']").get(0).click();
+        j.clickShortcut(page, "UNSTABLE-FAILURE");
 
-        assertFalse(
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value1").toIndex(axes)
-            )).get(0).isChecked()
-        );
-        assertTrue(
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value2").toIndex(axes)
-            )).get(0).isChecked()
-        );
-        assertTrue(
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value3").toIndex(axes)
-            )).get(0).isChecked()
-        );
+        j.assertCombinationChecked(page, false, axes, "value1");
+        j.assertCombinationChecked(page, true, axes, "value2");
+        j.assertCombinationChecked(page, true, axes, "value3");
     }
 
     @Test
@@ -247,26 +213,11 @@ public class ResultShortcutTest {
         WebClient wc = j.createAllow405WebClient();
         HtmlPage page = wc.getPage(p, "build");
 
-        page.<HtmlAnchor>selectNodes("//a[@data-shortcut-id='SUCCESS']").get(0).click();
+        j.clickShortcut(page, "SUCCESS");
 
-        assertFalse(
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value1").toIndex(axes)
-            )).get(0).isChecked()
-        );
-        assertTrue(
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value2").toIndex(axes)
-            )).get(0).isChecked()
-        );
-        assertFalse(
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value3").toIndex(axes)
-            )).get(0).isChecked()
-        );
+        j.assertCombinationChecked(page, false, axes, "value1");
+        j.assertCombinationChecked(page, true, axes, "value2");
+        j.assertCombinationChecked(page, false, axes, "value3");
     }
 
 
@@ -307,25 +258,10 @@ public class ResultShortcutTest {
         WebClient wc = j.createAllow405WebClient();
         HtmlPage page = wc.getPage(p, "build");
 
-        page.<HtmlAnchor>selectNodes("//a[@data-shortcut-id='SUCCESS']").get(0).click();
+        j.clickShortcut(page, "SUCCESS");
 
-        assertFalse(
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value1").toIndex(axes)
-            )).get(0).isChecked()
-        );
-        assertTrue(
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value2").toIndex(axes)
-            )).get(0).isChecked()
-        );
-        assertTrue(
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value3").toIndex(axes)
-            )).get(0).isChecked()
-        );
+        j.assertCombinationChecked(page, false, axes, "value1");
+        j.assertCombinationChecked(page, true, axes, "value2");
+        j.assertCombinationChecked(page, true, axes, "value3");
     }
 }

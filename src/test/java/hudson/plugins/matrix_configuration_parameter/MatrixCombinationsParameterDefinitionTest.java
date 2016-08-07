@@ -42,8 +42,6 @@ import org.jvnet.hudson.test.Bug;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
 import org.jvnet.hudson.test.SleepBuilder;
 
-import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
-import com.gargoylesoftware.htmlunit.html.HtmlCheckBoxInput;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
@@ -173,18 +171,9 @@ public class MatrixCombinationsParameterDefinitionTest {
         HtmlPage page = wc.getPage(p, "build");
         HtmlForm form = page.getFormByName("parameters");
         
-        page.<HtmlCheckBoxInput>selectNodes(String.format(
-            "//*[@data-combination='%s']//input[@type='checkbox']",
-            new Combination(axes, "value1").toIndex(axes)
-        )).get(0).setChecked(true);
-        page.<HtmlCheckBoxInput>selectNodes(String.format(
-            "//*[@data-combination='%s']//input[@type='checkbox']",
-            new Combination(axes, "value2").toIndex(axes)
-        )).get(0).setChecked(false);
-        page.<HtmlCheckBoxInput>selectNodes(String.format(
-            "//*[@data-combination='%s']//input[@type='checkbox']",
-            new Combination(axes, "value3").toIndex(axes)
-        )).get(0).setChecked(true);
+        j.checkCombination(page, true, axes, "value1");
+        j.checkCombination(page, false, axes, "value2");
+        j.checkCombination(page, true, axes, "value3");
         
         j.submit(form);
         
@@ -222,154 +211,54 @@ public class MatrixCombinationsParameterDefinitionTest {
         
         // Successful link
         {
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value1").toIndex(axes)
-            )).get(0).setChecked(false);
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value2").toIndex(axes)
-            )).get(0).setChecked(true);
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value3").toIndex(axes)
-            )).get(0).setChecked(true);
+            j.checkCombination(page, false, axes, "value1");
+            j.checkCombination(page, true, axes, "value2");
+            j.checkCombination(page, true, axes, "value3");
             
-            page.<HtmlAnchor>selectNodes("//a[@data-shortcut-id='SUCCESS']").get(0).click();
+            j.clickShortcut(page, "SUCCESS");
             
-            assertTrue(
-                page.<HtmlCheckBoxInput>selectNodes(String.format(
-                    "//*[@data-combination='%s']//input[@type='checkbox']",
-                    new Combination(axes, "value1").toIndex(axes)
-                )).get(0).isChecked()
-            );
-            assertFalse(
-                page.<HtmlCheckBoxInput>selectNodes(String.format(
-                    "//*[@data-combination='%s']//input[@type='checkbox']",
-                    new Combination(axes, "value2").toIndex(axes)
-                )).get(0).isChecked()
-            );
-            assertTrue(
-                page.<HtmlCheckBoxInput>selectNodes(String.format(
-                    "//*[@data-combination='%s']//input[@type='checkbox']",
-                    new Combination(axes, "value3").toIndex(axes)
-                )).get(0).isChecked()
-            );
-            
+            j.assertCombinationChecked(page, true, axes, "value1");
+            j.assertCombinationChecked(page, false, axes, "value2");
+            j.assertCombinationChecked(page, true, axes, "value3");
         }
  
         // Failed link
         {
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value1").toIndex(axes)
-            )).get(0).setChecked(true);
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value2").toIndex(axes)
-            )).get(0).setChecked(false);
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value3").toIndex(axes)
-            )).get(0).setChecked(false);
+            j.checkCombination(page, true, axes, "value1");
+            j.checkCombination(page, false, axes, "value2");
+            j.checkCombination(page, false, axes, "value3");
             
-            page.<HtmlAnchor>selectNodes("//a[@data-shortcut-id='FAILURE']").get(0).click();
+            j.clickShortcut(page, "FAILURE");
             
-            assertFalse(
-                page.<HtmlCheckBoxInput>selectNodes(String.format(
-                    "//*[@data-combination='%s']//input[@type='checkbox']",
-                    new Combination(axes, "value1").toIndex(axes)
-                )).get(0).isChecked()
-            );
-            assertTrue(
-                page.<HtmlCheckBoxInput>selectNodes(String.format(
-                    "//*[@data-combination='%s']//input[@type='checkbox']",
-                    new Combination(axes, "value2").toIndex(axes)
-                )).get(0).isChecked()
-            );
-            assertFalse(
-                page.<HtmlCheckBoxInput>selectNodes(String.format(
-                    "//*[@data-combination='%s']//input[@type='checkbox']",
-                    new Combination(axes, "value3").toIndex(axes)
-                )).get(0).isChecked()
-            );
-            
+            j.assertCombinationChecked(page, false, axes, "value1");
+            j.assertCombinationChecked(page, true, axes, "value2");
+            j.assertCombinationChecked(page, false, axes, "value3");
         }
         
         // All link
         {
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value1").toIndex(axes)
-            )).get(0).setChecked(false);
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value2").toIndex(axes)
-            )).get(0).setChecked(false);
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value3").toIndex(axes)
-            )).get(0).setChecked(true);
+            j.checkCombination(page, false, axes, "value1");
+            j.checkCombination(page, false, axes, "value2");
+            j.checkCombination(page, true, axes, "value3");
             
-            page.<HtmlAnchor>selectNodes("//a[@data-shortcut-id='All']").get(0).click();
+            j.clickShortcut(page, "All");
             
-            assertTrue(
-                page.<HtmlCheckBoxInput>selectNodes(String.format(
-                    "//*[@data-combination='%s']//input[@type='checkbox']",
-                    new Combination(axes, "value1").toIndex(axes)
-                )).get(0).isChecked()
-            );
-            assertTrue(
-                page.<HtmlCheckBoxInput>selectNodes(String.format(
-                    "//*[@data-combination='%s']//input[@type='checkbox']",
-                    new Combination(axes, "value2").toIndex(axes)
-                )).get(0).isChecked()
-            );
-            assertTrue(
-                page.<HtmlCheckBoxInput>selectNodes(String.format(
-                    "//*[@data-combination='%s']//input[@type='checkbox']",
-                    new Combination(axes, "value3").toIndex(axes)
-                )).get(0).isChecked()
-            );
-            
+            j.assertCombinationChecked(page, true, axes, "value1");
+            j.assertCombinationChecked(page, true, axes, "value2");
+            j.assertCombinationChecked(page, true, axes, "value3");
         }
         
         // None link
         {
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value1").toIndex(axes)
-            )).get(0).setChecked(true);
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value2").toIndex(axes)
-            )).get(0).setChecked(true);
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value3").toIndex(axes)
-            )).get(0).setChecked(false);
+            j.checkCombination(page, true, axes, "value1");
+            j.checkCombination(page, true, axes, "value2");
+            j.checkCombination(page, false, axes, "value3");
             
-            page.<HtmlAnchor>selectNodes("//a[@data-shortcut-id='None']").get(0).click();
+            j.clickShortcut(page, "None");
             
-            assertFalse(
-                page.<HtmlCheckBoxInput>selectNodes(String.format(
-                    "//*[@data-combination='%s']//input[@type='checkbox']",
-                    new Combination(axes, "value1").toIndex(axes)
-                )).get(0).isChecked()
-            );
-            assertFalse(
-                page.<HtmlCheckBoxInput>selectNodes(String.format(
-                    "//*[@data-combination='%s']//input[@type='checkbox']",
-                    new Combination(axes, "value2").toIndex(axes)
-                )).get(0).isChecked()
-            );
-            assertFalse(
-                page.<HtmlCheckBoxInput>selectNodes(String.format(
-                    "//*[@data-combination='%s']//input[@type='checkbox']",
-                    new Combination(axes, "value3").toIndex(axes)
-                )).get(0).isChecked()
-            );
-            
+            j.assertCombinationChecked(page, false, axes, "value1");
+            j.assertCombinationChecked(page, false, axes, "value2");
+            j.assertCombinationChecked(page, false, axes, "value3");
         }
     }
     
@@ -390,22 +279,10 @@ public class MatrixCombinationsParameterDefinitionTest {
         HtmlPage page = wc.getPage(p, "build");
         HtmlForm form = page.getFormByName("parameters");
         
-        page.<HtmlCheckBoxInput>selectNodes(String.format(
-            "//*[@data-combination='%s']//input[@type='checkbox']",
-            new Combination(axes, "value1-1", "value2-1").toIndex(axes)
-        )).get(0).setChecked(false);
-        page.<HtmlCheckBoxInput>selectNodes(String.format(
-            "//*[@data-combination='%s']//input[@type='checkbox']",
-            new Combination(axes, "value1-1", "value2-2").toIndex(axes)
-        )).get(0).setChecked(true);
-        page.<HtmlCheckBoxInput>selectNodes(String.format(
-            "//*[@data-combination='%s']//input[@type='checkbox']",
-            new Combination(axes, "value1-2", "value2-1").toIndex(axes)
-        )).get(0).setChecked(true);
-        page.<HtmlCheckBoxInput>selectNodes(String.format(
-            "//*[@data-combination='%s']//input[@type='checkbox']",
-            new Combination(axes, "value1-2", "value2-2").toIndex(axes)
-        )).get(0).setChecked(false);
+        j.checkCombination(page, false, axes, "value1-1", "value2-1");
+        j.checkCombination(page, true, axes, "value1-1", "value2-2");
+        j.checkCombination(page, true, axes, "value1-2", "value2-1");
+        j.checkCombination(page, false, axes, "value1-2", "value2-2");
         
         j.submit(form);
         
@@ -449,190 +326,62 @@ public class MatrixCombinationsParameterDefinitionTest {
         
         // Successful link
         {
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value1-1", "value2-1").toIndex(axes)
-            )).get(0).setChecked(true);
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value1-1", "value2-2").toIndex(axes)
-            )).get(0).setChecked(false);
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value1-2", "value2-1").toIndex(axes)
-            )).get(0).setChecked(true);
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value1-2", "value2-2").toIndex(axes)
-            )).get(0).setChecked(false);
+            j.checkCombination(page, true, axes, "value1-1", "value2-1");
+            j.checkCombination(page, false, axes, "value1-1", "value2-2");
+            j.checkCombination(page, true, axes, "value1-2", "value2-1");
+            j.checkCombination(page, false, axes, "value1-2", "value2-2");
             
-            page.<HtmlAnchor>selectNodes("//a[@data-shortcut-id='SUCCESS']").get(0).click();
+            j.clickShortcut(page, "SUCCESS");
             
-            assertTrue(
-                page.<HtmlCheckBoxInput>selectNodes(String.format(
-                    "//*[@data-combination='%s']//input[@type='checkbox']",
-                    new Combination(axes, "value1-1", "value2-1").toIndex(axes)
-                )).get(0).isChecked()
-            );
-            assertFalse(
-                page.<HtmlCheckBoxInput>selectNodes(String.format(
-                    "//*[@data-combination='%s']//input[@type='checkbox']",
-                    new Combination(axes, "value1-1", "value2-2").toIndex(axes)
-                )).get(0).isChecked()
-            );
-            assertTrue(
-                page.<HtmlCheckBoxInput>selectNodes(String.format(
-                    "//*[@data-combination='%s']//input[@type='checkbox']",
-                    new Combination(axes, "value1-2", "value2-1").toIndex(axes)
-                )).get(0).isChecked()
-            );
-            assertTrue(
-                page.<HtmlCheckBoxInput>selectNodes(String.format(
-                    "//*[@data-combination='%s']//input[@type='checkbox']",
-                    new Combination(axes, "value1-2", "value2-2").toIndex(axes)
-                )).get(0).isChecked()
-            );
+            j.assertCombinationChecked(page, true, axes, "value1-1", "value2-1");
+            j.assertCombinationChecked(page, false, axes, "value1-1", "value2-2");
+            j.assertCombinationChecked(page, true, axes, "value1-2", "value2-1");
+            j.assertCombinationChecked(page, true, axes, "value1-2", "value2-2");
         }
         
         // Failed link
         {
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value1-1", "value2-1").toIndex(axes)
-            )).get(0).setChecked(false);
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value1-1", "value2-2").toIndex(axes)
-            )).get(0).setChecked(true);
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value1-2", "value2-1").toIndex(axes)
-            )).get(0).setChecked(false);
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value1-2", "value2-2").toIndex(axes)
-            )).get(0).setChecked(true);
+            j.checkCombination(page, false, axes, "value1-1", "value2-1");
+            j.checkCombination(page, true, axes, "value1-1", "value2-2");
+            j.checkCombination(page, false, axes, "value1-2", "value2-1");
+            j.checkCombination(page, true, axes, "value1-2", "value2-2");
             
-            page.<HtmlAnchor>selectNodes("//a[@data-shortcut-id='FAILURE']").get(0).click();
+            j.clickShortcut(page, "FAILURE");
             
-            assertFalse(
-                page.<HtmlCheckBoxInput>selectNodes(String.format(
-                    "//*[@data-combination='%s']//input[@type='checkbox']",
-                    new Combination(axes, "value1-1", "value2-1").toIndex(axes)
-                )).get(0).isChecked()
-            );
-            assertTrue(
-                page.<HtmlCheckBoxInput>selectNodes(String.format(
-                    "//*[@data-combination='%s']//input[@type='checkbox']",
-                    new Combination(axes, "value1-1", "value2-2").toIndex(axes)
-                )).get(0).isChecked()
-            );
-            assertFalse(
-                page.<HtmlCheckBoxInput>selectNodes(String.format(
-                    "//*[@data-combination='%s']//input[@type='checkbox']",
-                    new Combination(axes, "value1-2", "value2-1").toIndex(axes)
-                )).get(0).isChecked()
-            );
-            assertFalse(
-                page.<HtmlCheckBoxInput>selectNodes(String.format(
-                    "//*[@data-combination='%s']//input[@type='checkbox']",
-                    new Combination(axes, "value1-2", "value2-2").toIndex(axes)
-                )).get(0).isChecked()
-            );
+            j.assertCombinationChecked(page, false, axes, "value1-1", "value2-1");
+            j.assertCombinationChecked(page, true, axes, "value1-1", "value2-2");
+            j.assertCombinationChecked(page, false, axes, "value1-2", "value2-1");
+            j.assertCombinationChecked(page, false, axes, "value1-2", "value2-2");
         }
         
         // All link
         {
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value1-1", "value2-1").toIndex(axes)
-            )).get(0).setChecked(false);
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value1-1", "value2-2").toIndex(axes)
-            )).get(0).setChecked(true);
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value1-2", "value2-1").toIndex(axes)
-            )).get(0).setChecked(false);
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value1-2", "value2-2").toIndex(axes)
-            )).get(0).setChecked(true);
+            j.checkCombination(page, false, axes, "value1-1", "value2-1");
+            j.checkCombination(page, true, axes, "value1-1", "value2-2");
+            j.checkCombination(page, false, axes, "value1-2", "value2-1");
+            j.checkCombination(page, true, axes, "value1-2", "value2-2");
             
-            page.<HtmlAnchor>selectNodes("//a[@data-shortcut-id='All']").get(0).click();
+            j.clickShortcut(page, "All");
             
-            assertTrue(
-                page.<HtmlCheckBoxInput>selectNodes(String.format(
-                    "//*[@data-combination='%s']//input[@type='checkbox']",
-                    new Combination(axes, "value1-1", "value2-1").toIndex(axes)
-                )).get(0).isChecked()
-            );
-            assertTrue(
-                page.<HtmlCheckBoxInput>selectNodes(String.format(
-                    "//*[@data-combination='%s']//input[@type='checkbox']",
-                    new Combination(axes, "value1-1", "value2-2").toIndex(axes)
-                )).get(0).isChecked()
-            );
-            assertTrue(
-                page.<HtmlCheckBoxInput>selectNodes(String.format(
-                    "//*[@data-combination='%s']//input[@type='checkbox']",
-                    new Combination(axes, "value1-2", "value2-1").toIndex(axes)
-                )).get(0).isChecked()
-            );
-            assertTrue(
-                page.<HtmlCheckBoxInput>selectNodes(String.format(
-                    "//*[@data-combination='%s']//input[@type='checkbox']",
-                    new Combination(axes, "value1-2", "value2-2").toIndex(axes)
-                )).get(0).isChecked()
-            );
+            j.assertCombinationChecked(page, true, axes, "value1-1", "value2-1");
+            j.assertCombinationChecked(page, true, axes, "value1-1", "value2-2");
+            j.assertCombinationChecked(page, true, axes, "value1-2", "value2-1");
+            j.assertCombinationChecked(page, true, axes, "value1-2", "value2-2");
         }
         
         // None link
         {
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value1-1", "value2-1").toIndex(axes)
-            )).get(0).setChecked(false);
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value1-1", "value2-2").toIndex(axes)
-            )).get(0).setChecked(true);
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value1-2", "value2-1").toIndex(axes)
-            )).get(0).setChecked(false);
-            page.<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, "value1-2", "value2-2").toIndex(axes)
-            )).get(0).setChecked(true);
+            j.checkCombination(page, false, axes, "value1-1", "value2-1");
+            j.checkCombination(page, true, axes, "value1-1", "value2-2");
+            j.checkCombination(page, false, axes, "value1-2", "value2-1");
+            j.checkCombination(page, true, axes, "value1-2", "value2-2");
             
-            page.<HtmlAnchor>selectNodes("//a[@data-shortcut-id='None']").get(0).click();
+            j.clickShortcut(page, "None");
             
-            assertFalse(
-                page.<HtmlCheckBoxInput>selectNodes(String.format(
-                    "//*[@data-combination='%s']//input[@type='checkbox']",
-                    new Combination(axes, "value1-1", "value2-1").toIndex(axes)
-                )).get(0).isChecked()
-            );
-            assertFalse(
-                page.<HtmlCheckBoxInput>selectNodes(String.format(
-                    "//*[@data-combination='%s']//input[@type='checkbox']",
-                    new Combination(axes, "value1-1", "value2-2").toIndex(axes)
-                )).get(0).isChecked()
-            );
-            assertFalse(
-                page.<HtmlCheckBoxInput>selectNodes(String.format(
-                    "//*[@data-combination='%s']//input[@type='checkbox']",
-                    new Combination(axes, "value1-2", "value2-1").toIndex(axes)
-                )).get(0).isChecked()
-            );
-            assertFalse(
-                page.<HtmlCheckBoxInput>selectNodes(String.format(
-                    "//*[@data-combination='%s']//input[@type='checkbox']",
-                    new Combination(axes, "value1-2", "value2-2").toIndex(axes)
-                )).get(0).isChecked()
-            );
+            j.assertCombinationChecked(page, false, axes, "value1-1", "value2-1");
+            j.assertCombinationChecked(page, false, axes, "value1-1", "value2-2");
+            j.assertCombinationChecked(page, false, axes, "value1-2", "value2-1");
+            j.assertCombinationChecked(page, false, axes, "value1-2", "value2-2");
         }
     }
     
