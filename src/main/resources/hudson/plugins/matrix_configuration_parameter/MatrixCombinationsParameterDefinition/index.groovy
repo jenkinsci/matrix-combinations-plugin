@@ -17,10 +17,6 @@ st = namespace("jelly:stapler")
 f = namespace("lib/form")
 nsProject = namespace("/hudson/plugins/matrix_configuration_parameter/taglib")
 
-st.once {
-    st.adjunct(includes: "hudson.plugins.matrix_configuration_parameter.MatrixCombinationsParameterDefinition.shortcut");
-}
-
 
 def paramDef = it;
 String nameIt = it.getName();
@@ -60,16 +56,7 @@ private void drawMainBody(MatrixCombinationsParameterDefinition paramDef, Namesp
             nsProject.matrix(it: project, layouter: layouter) {
               drawMainBall(paramDef, p, project.axes, nameIt, project, layouter);
             }
-            span(style: "font-weight: bold;") { text("Select: "); }
-            paramDef.shortcutList.each { shortcut ->
-                a(class: "shortcut shortcut-" + shortcut.id, href: "#", "data-shortcut-id": shortcut.id, "data-combinations": shortcut.getCombinationsData(project, build)) {
-                    text(shortcut.name);
-                }
-                if (shortcut != paramDef.shortcutList.last()) {
-                    // TODO: replace with appropreate CSS.
-                    text(" - ");
-                }
-            }
+            nsProject.shortcut(parameter: paramDef, project: project, build: build);
         }//div
     }
 }

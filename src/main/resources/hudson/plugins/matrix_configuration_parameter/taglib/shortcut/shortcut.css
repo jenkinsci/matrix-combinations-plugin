@@ -1,0 +1,20 @@
+.matrix-combinations-parameter-shortcut .head {
+  font-weight: bold;
+}
+
+.matrix-combinations-parameter-shortcut ul.shortcuts {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.matrix-combinations-parameter-shortcut ul.shortcuts li {
+  display: inline-block;
+}
+
+.matrix-combinations-parameter-shortcut ul.shortcuts li + li:before {
+  content: "-";
+  margin-left: 1ex;
+  margin-right: 1ex;
+}

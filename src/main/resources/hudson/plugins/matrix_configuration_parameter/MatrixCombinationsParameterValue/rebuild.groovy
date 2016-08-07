@@ -6,6 +6,8 @@ import hudson.matrix.Combination
 import hudson.matrix.Layouter
 import hudson.matrix.MatrixBuild
 import hudson.matrix.MatrixProject
+import hudson.model.ParametersDefinitionProperty
+import hudson.plugins.matrix_configuration_parameter.MatrixCombinationsParameterDefinition
 import lib.LayoutTagLib
 import org.kohsuke.stapler.jelly.groovy.Namespace
 
@@ -37,16 +39,24 @@ Layouter layouter = new Layouter<Combination>(axes) {
     }
 };
 
-drawParameterBody(f, valueIt, axes, project, build, layouter);
+def parameterDefinition = project.getProperty(ParametersDefinitionProperty.class).getParameterDefinition(valueIt.name);
+if (!(parameterDefinition instanceof MatrixCombinationsParameterDefinition)) {
+    parameterDefinition = null;
+}
+
+drawParameterBody(parameterDefinition, f, valueIt, axes, project, build, layouter);
 
 
 
-private void drawParameterBody(Namespace f,valueIt,AxisList axes,MatrixProject project,MatrixBuild build,Layouter layouter) {
+private void drawParameterBody(MatrixCombinationsParameterDefinition paramDef, Namespace f,valueIt,AxisList axes,MatrixProject project,MatrixBuild build,Layouter layouter) {
     f.entry(title: valueIt.getName(), description: it.getDescription()) {
-        div(name: "parameter") {
+        div(name: "parameter", class: "matrix-combinations-parameter") {
             input(type: "hidden", name: "name", value: valueIt.getName())
             nsProject.matrix(it: build, layouter: layouter) {
               drawTableBall(p, project.axes, valueIt, project, build, layouter);
+            }
+            if (paramDef != null) {
+              nsProject.shortcut(parameter: paramDef, project: project, build: build);
             }
         }//div
     }
@@ -63,15 +73,19 @@ private void drawTableBall(Combination combination,AxisList axes,matrixValue,Mat
               text(combination.toString(layouter.z))
             }
         }
-        f.checkbox(checked: "true", name: "values",id: String.format("checkbox%s-%s", matrixValue.getName(), combination.toString('-' as char, '-' as char)));
-        input(type: "hidden", name: "confs", value: combination.toString());
+        span(class: "combination", "data-combination": combination.toIndex(axes)) {
+            f.checkbox(checked: true, name: "values");
+            input(type: "hidden", name: "confs", value: combination.toString());
+        }
 
     } else {
         img(src: "${imagesURL}/24x24/grey.gif");
         if (!layouter.x || !layouter.y) {
           text(combination.toString(layouter.z))
         }
-        f.checkbox(checked: "false", name: "values",id: String.format("checkbox%s-%s", matrixValue.getName(), combination.toString('-' as char, '-' as char)));
-        input(type: "hidden", name: "confs", value: combination.toString());
+        span(class: "combination", "data-combination": combination.toIndex(axes)) {
+            f.checkbox(checked: "false", name: "values")
+            input(type: "hidden", name: "confs", value: combination.toString())
+        }
     }
 }
