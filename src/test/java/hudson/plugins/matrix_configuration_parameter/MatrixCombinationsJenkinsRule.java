@@ -94,7 +94,7 @@ public class MatrixCombinationsJenkinsRule extends JenkinsRule {
     public void clickShortcut(HtmlPage page, int index, String name) throws Exception {
         page.<HtmlElement>selectNodes("//*[@class='matrix-combinations-parameter']").get(index)
             .<HtmlAnchor>selectNodes(String.format(
-                "//a[@data-shortcut-id='%s']",
+                ".//a[@data-shortcut-id='%s']",
                 name
             )).get(0).click();
     }
@@ -108,7 +108,7 @@ public class MatrixCombinationsJenkinsRule extends JenkinsRule {
             checked,
             page.<HtmlElement>selectNodes("//*[@class='matrix-combinations-parameter']").get(index)
                 .<HtmlCheckBoxInput>selectNodes(String.format(
-                    "//*[@data-combination='%s']//input[@type='checkbox']",
+                    ".//*[@data-combination='%s']//input[@type='checkbox']",
                     new Combination(axes, values).toIndex(axes)
                 )).get(0).isChecked()
         );

@@ -39,6 +39,7 @@ import hudson.model.Result;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Bug;
+import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
 import org.jvnet.hudson.test.SleepBuilder;
 
@@ -457,5 +458,103 @@ public class MatrixCombinationsParameterDefinitionTest {
         
         // default trigger
         j.assertBuildStatusSuccess(p.scheduleBuild2(0));
+    }
+
+    @Issue("JENKINS-36861")
+    @Test
+    public void testNotBuilt() throws Exception {
+        AxisList axes = new AxisList(new TextAxis("axis1", "value1", "value2", "value3"));
+        MatrixProject p = j.createMatrixProject();
+        p.setAxes(axes);
+        p.addProperty(new ParametersDefinitionProperty(
+            new MatrixCombinationsParameterDefinition("combinations", "", "")
+        ));
+        p.getBuildersList().add(new ConditionalFailBuilder("${axis1}", "value2"));
+        p.setCombinationFilter("axis1 != 'value3'");
+
+        MatrixBuild b = p.scheduleBuild2(0).get();
+
+        j.assertBuildStatus(Result.SUCCESS, b.getExactRun(new Combination(axes, "value1")));
+        j.assertBuildStatus(Result.FAILURE, b.getExactRun(new Combination(axes, "value2")));
+        assertNull(b.getExactRun(new Combination(axes, "value3")));
+
+        p.setCombinationFilter("");
+
+        WebClient wc = j.createAllow405WebClient();
+        HtmlPage page = wc.getPage(p, "build");
+
+        j.clickShortcut(page, "SUCCESS");
+        j.assertCombinationChecked(page, true, axes, "value1");
+        j.assertCombinationChecked(page, false, axes, "value2");
+        j.assertCombinationChecked(page, false, axes, "value3");
+
+        j.clickShortcut(page, "FAILURE");
+        j.assertCombinationChecked(page, false, axes, "value1");
+        j.assertCombinationChecked(page, true, axes, "value2");
+        j.assertCombinationChecked(page, false, axes, "value3");
+
+        j.clickShortcut(page, "All");
+        j.assertCombinationChecked(page, true, axes, "value1");
+        j.assertCombinationChecked(page, true, axes, "value2");
+        j.assertCombinationChecked(page, true, axes, "value3");
+    }
+
+    @Issue("JENKINS-30918")
+    @Test
+    public void testMultiParameters() throws Exception {
+        AxisList axes = new AxisList(new TextAxis("axis1", "value1", "value2", "value3"));
+        MatrixProject p = j.createMatrixProject();
+        p.setAxes(axes);
+        p.addProperty(new ParametersDefinitionProperty(
+            new MatrixCombinationsParameterDefinition("combinations1", "", ""),
+            new MatrixCombinationsParameterDefinition("combinations2", "", "")
+        ));
+        p.setCombinationFilter("axis1 != 'value3'");
+
+        WebClient wc = j.createAllow405WebClient();
+        HtmlPage page = wc.getPage(p, "build");
+
+        j.assertCombinationChecked(page, 0, true, axes, "value1");
+        j.assertCombinationChecked(page, 0, true, axes, "value2");
+        j.assertCombinationChecked(page, 0, false, axes, "value3");
+        j.assertCombinationChecked(page, 1, true, axes, "value1");
+        j.assertCombinationChecked(page, 1, true, axes, "value2");
+        j.assertCombinationChecked(page, 1, false, axes, "value3");
+
+        j.clickShortcut(page, 1, "None");
+
+        j.assertCombinationChecked(page, 0, true, axes, "value1");
+        j.assertCombinationChecked(page, 0, true, axes, "value2");
+        j.assertCombinationChecked(page, 0, false, axes, "value3");
+        j.assertCombinationChecked(page, 1, false, axes, "value1");
+        j.assertCombinationChecked(page, 1, false, axes, "value2");
+        j.assertCombinationChecked(page, 1, false, axes, "value3");
+
+        j.clickShortcut(page, 0, "None");
+
+        j.assertCombinationChecked(page, 0, false, axes, "value1");
+        j.assertCombinationChecked(page, 0, false, axes, "value2");
+        j.assertCombinationChecked(page, 0, false, axes, "value3");
+        j.assertCombinationChecked(page, 1, false, axes, "value1");
+        j.assertCombinationChecked(page, 1, false, axes, "value2");
+        j.assertCombinationChecked(page, 1, false, axes, "value3");
+
+        j.clickShortcut(page, 1, "All");
+
+        j.assertCombinationChecked(page, 0, false, axes, "value1");
+        j.assertCombinationChecked(page, 0, false, axes, "value2");
+        j.assertCombinationChecked(page, 0, false, axes, "value3");
+        j.assertCombinationChecked(page, 1, true, axes, "value1");
+        j.assertCombinationChecked(page, 1, true, axes, "value2");
+        j.assertCombinationChecked(page, 1, false, axes, "value3");
+
+        j.clickShortcut(page, 0, "All");
+
+        j.assertCombinationChecked(page, 0, true, axes, "value1");
+        j.assertCombinationChecked(page, 0, true, axes, "value2");
+        j.assertCombinationChecked(page, 0, false, axes, "value3");
+        j.assertCombinationChecked(page, 1, true, axes, "value1");
+        j.assertCombinationChecked(page, 1, true, axes, "value2");
+        j.assertCombinationChecked(page, 1, false, axes, "value3");
     }
 }
