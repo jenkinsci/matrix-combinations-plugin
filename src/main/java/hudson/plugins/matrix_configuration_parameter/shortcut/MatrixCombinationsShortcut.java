@@ -61,6 +61,7 @@ public abstract class MatrixCombinationsShortcut
      *     {@code null} if there's no builds.
      * @return combinations to check.
      */
+    @Nonnull
     public abstract Collection<Combination> getCombinations(
         @Nonnull MatrixProject project,
         @CheckForNull MatrixBuild build
@@ -73,6 +74,7 @@ public abstract class MatrixCombinationsShortcut
      * @param build the target build
      * @return comma-separated list of combination indices
      */
+    @Nonnull
     public final String getCombinationsData(
         @Nonnull final MatrixProject project,
         @CheckForNull MatrixBuild build
@@ -121,6 +123,7 @@ public abstract class MatrixCombinationsShortcut
         /**
          * {@inheritDoc}
          */
+        @Nonnull
         @Override
         public Collection<Combination> getCombinations(
             @Nonnull MatrixProject project,
@@ -139,6 +142,7 @@ public abstract class MatrixCombinationsShortcut
         /**
          * {@inheritDoc}
          */
+        @Nonnull
         @Override
         public String getName() {
             return getDescriptor().getDisplayName();
@@ -147,6 +151,7 @@ public abstract class MatrixCombinationsShortcut
         /**
          * {@inheritDoc}
          */
+        @Nonnull
         @Override
         public String getId() {
             return "All";
@@ -181,6 +186,7 @@ public abstract class MatrixCombinationsShortcut
         /**
          * {@inheritDoc}
          */
+        @Nonnull
         @Override
         public Collection<Combination> getCombinations(
             @Nonnull MatrixProject project,
@@ -192,6 +198,7 @@ public abstract class MatrixCombinationsShortcut
         /**
          * {@inheritDoc}
          */
+        @Nonnull
         @Override
         public String getName() {
             return getDescriptor().getDisplayName();
@@ -200,6 +207,7 @@ public abstract class MatrixCombinationsShortcut
         /**
          * {@inheritDoc}
          */
+        @Nonnull
         @Override
         public String getId() {
             return "None";
