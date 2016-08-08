@@ -24,10 +24,15 @@
 
 Behaviour.specify(".matrix-combinations-parameter .shortcut", "matrix-combinations-parameter-shortcut", 0, function (e) {
   e.observe("click", function(e) {
-    var indexToCheck = this.readAttribute("data-combinations").split(",");
+    var combinations = this.readAttribute("data-combinations");
+    if (!combinations) {
+        combinations = "";
+    }
+    var indexToCheck = combinations.split(",");
     var block = this.up(".matrix-combinations-parameter");
     block.select(".combination").each(function(c) {
-      var toCheck = (indexToCheck.indexOf(c.readAttribute("data-combination")) >= 0);
+      var combination = c.readAttribute("data-combination");
+      var toCheck = combination && (indexToCheck.indexOf(combination) >= 0);
       c.select("input[type='checkbox']").each(function(checkbox) {
         checkbox.checked = toCheck;
       });
