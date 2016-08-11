@@ -159,7 +159,7 @@ public class ResultShortcut extends MatrixCombinationsShortcut {
     public static class DescriptorImpl extends MatrixCombinationsShortcutDescriptor {
         @Override
         public String getDisplayName() {
-            return "By build result";
+            return Messages.ResultShortcut_DisplayName();
         }
     }
 }

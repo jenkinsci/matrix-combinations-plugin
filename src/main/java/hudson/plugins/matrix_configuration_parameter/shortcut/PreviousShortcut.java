@@ -99,7 +99,7 @@ public class PreviousShortcut extends MatrixCombinationsShortcut {
          */
         @Override
         public String getDisplayName() {
-            return "Previous";
+            return Messages.PreviousShortcut_DisplayName();
         }
     }
 }

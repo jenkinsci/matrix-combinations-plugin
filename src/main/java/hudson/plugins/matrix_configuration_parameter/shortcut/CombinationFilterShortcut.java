@@ -124,7 +124,7 @@ public class CombinationFilterShortcut extends MatrixCombinationsShortcut {
          */
         @Override
         public String getDisplayName() {
-            return "By combination filter";
+            return Messages.CombinationFilterShortcut_DisplayName();
         }
     }
 }

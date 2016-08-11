@@ -167,7 +167,7 @@ public abstract class MatrixCombinationsShortcut
              */
             @Override
             public String getDisplayName() {
-                return "All";
+                return Messages.MatrixCombinationsShortcut_All_DisplayName();
             }
         }
     }
@@ -223,7 +223,7 @@ public abstract class MatrixCombinationsShortcut
              */
             @Override
             public String getDisplayName() {
-                return "None";
+                return Messages.MatrixCombinationsShortcut_None_DisplayName();
             }
         }
     }
