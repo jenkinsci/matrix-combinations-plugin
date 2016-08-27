@@ -25,6 +25,8 @@
 package hudson.plugins.matrix_configuration_parameter;
 
 import static org.junit.Assert.*;
+
+import hudson.cli.CLI;
 import hudson.matrix.AxisList;
 import hudson.matrix.Combination;
 import hudson.matrix.MatrixBuild;
@@ -556,5 +558,35 @@ public class MatrixCombinationsParameterDefinitionTest {
         j.assertCombinationChecked(page, 1, true, axes, "value1");
         j.assertCombinationChecked(page, 1, true, axes, "value2");
         j.assertCombinationChecked(page, 1, false, axes, "value3");
+    }
+
+    @Test
+    public void testCliBuild() throws Exception {
+        AxisList axes = new AxisList(new TextAxis("axis1", "value1", "value2", "value3"));
+        MatrixProject p = j.createMatrixProject();
+        p.setAxes(axes);
+        p.addProperty(new ParametersDefinitionProperty(
+            new MatrixCombinationsParameterDefinition("combinations", "", "")
+        ));
+
+        CLI cli = new CLI(j.getURL());
+        int ret = cli.execute(
+            "build",
+            p.getFullName(),
+            "-p",
+            // You can't use axis1 != 'value2'
+            // for JENKINS-21160 (fixed in Jenkins 1.606)
+            "combinations=axis1 in ['value1', 'value3']"
+        );
+        assertEquals(0, ret);
+
+        j.waitUntilNoActivity();
+
+        MatrixBuild b = p.getLastBuild();
+        j.assertBuildStatusSuccess(b);
+
+        assertNotNull(b.getExactRun(new Combination(axes, "value1")));
+        assertNull(b.getExactRun(new Combination(axes, "value2")));
+        assertNotNull(b.getExactRun(new Combination(axes, "value3")));
     }
 }

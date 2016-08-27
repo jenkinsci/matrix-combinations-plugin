@@ -24,6 +24,7 @@
 package hudson.plugins.matrix_configuration_parameter;
 
 import hudson.Extension;
+import hudson.cli.CLICommand;
 import hudson.model.ParameterDefinition;
 import hudson.model.ParameterValue;
 import hudson.model.Result;
@@ -32,6 +33,7 @@ import hudson.plugins.matrix_configuration_parameter.shortcut.MatrixCombinations
 import hudson.plugins.matrix_configuration_parameter.shortcut.ResultShortcut;
 import net.sf.json.JSONObject;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -129,8 +131,29 @@ public class MatrixCombinationsParameterDefinition extends ParameterDefinition {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ParameterValue createValue(CLICommand command, String value) throws IOException, InterruptedException {
+        return createValue(value);
+    }
 
-    
+    /**
+     * Decide combinations from combinations filter
+     *
+     * @param value groovy expression for combinations filter
+     * @return matrix-combinations parameter with the specified combinations filter
+     *
+     * @since 1.1.0
+     */
+    protected ParameterValue createValue(String value) throws IOException, InterruptedException {
+        return new DefaultMatrixCombinationsParameterValue(
+            getName(),
+            getDescription(),
+            value
+        );
+    }
 
     @Override
     public MatrixCombinationsParameterValue getDefaultParameterValue() {
