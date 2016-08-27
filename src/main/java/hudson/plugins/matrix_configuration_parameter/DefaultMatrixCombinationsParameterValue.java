@@ -41,7 +41,7 @@ public class DefaultMatrixCombinationsParameterValue extends MatrixCombinationsP
     private final String combinationFilter;
     
     public DefaultMatrixCombinationsParameterValue(String name, String description, String combinationFilter) {
-        super(name, new Boolean[0], new String[0], description);
+        super(name, description, null);
         this.combinationFilter = combinationFilter;
     }
     

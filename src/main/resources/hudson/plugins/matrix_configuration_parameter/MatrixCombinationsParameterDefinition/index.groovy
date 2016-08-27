@@ -75,8 +75,7 @@ private void drawMainBall(MatrixCombinationsParameterDefinition paramDef, Combin
             }
             checked = combination.evalGroovyExpression(axes, paramDef.defaultCombinationFilter?:project.combinationFilter)
             span(class: "combination", "data-combination": combination.toIndex(axes)) {
-                f.checkbox(checked: checked, name: "values")
-                input(type: "hidden", name: "confs", value: combination.toString())
+                f.checkbox(checked: checked, name: "combinations", json: combination.toString())
             }
         }
 
@@ -88,8 +87,7 @@ private void drawMainBall(MatrixCombinationsParameterDefinition paramDef, Combin
         
         checked = combination.evalGroovyExpression(axes, paramDef.defaultCombinationFilter?:project.combinationFilter)
         span(class: "combination", "data-combination": combination.toIndex(axes)) {
-            f.checkbox(checked: checked, name: "values")
-            input(type: "hidden", name: "confs", value: combination.toString())
+            f.checkbox(checked: checked, name: "combinations", json: combination.toString())
         }
     }
 

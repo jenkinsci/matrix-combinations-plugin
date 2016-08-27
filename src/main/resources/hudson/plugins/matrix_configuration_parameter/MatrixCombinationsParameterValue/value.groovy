@@ -61,8 +61,7 @@ private void drawTableBall(Combination combination,AxisList axes,MatrixCombinati
                 text(combination.toString(layouter.z))
               }
             span(class: "combination", "data-combination": combination.toIndex(axes)) {
-                f.checkbox(checked: true, name: "values", readonly: true);
-                input(type: "hidden", name: "confs", value: combination.toString());
+                f.checkbox(checked: true, name: "combinations", readonly: true, json: combination.toString());
             }
         }
 
@@ -72,8 +71,7 @@ private void drawTableBall(Combination combination,AxisList axes,MatrixCombinati
             text(combination.toString(layouter.z))
           }
         span(class: "combination", "data-combination": combination.toIndex(axes)) {
-            f.checkbox(checked: false, name: "values", readonly: true);
-            input(type: "hidden", name: "confs", value: combination.toString());
+            f.checkbox(checked: false, name: "combinations", readonly: true, json: combination.toString());
         }
     }
 }
