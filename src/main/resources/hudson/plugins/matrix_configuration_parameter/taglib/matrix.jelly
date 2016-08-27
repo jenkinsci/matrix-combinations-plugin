@@ -43,7 +43,7 @@ THE SOFTWARE.
 
   <j:set var="layouter" value="${layouter?:it.layouter}"/>
   <j:set var="o" value="${layouter}"/>
-  <div id='matrix'>
+  <div class='matrix'>
     <j:choose>
       <!-- Optimized case when there's only one dimension to the axis (or zero dimension) -->
       <j:when test="${empty(o.x) and empty(o.y)}">
@@ -53,13 +53,13 @@ THE SOFTWARE.
         </j:forEach>
       </j:when>
       <j:otherwise>
-        <table id="configuration-matrix">
+        <table class="configuration-matrix">
           <!-- X-axis -->
           <j:forEach var="x" items="${o.x}" varStatus="loop">
             <tr class="matrix-row">
               <!-- space for Y-axis -->
               <j:if test="${!empty(o.y)}">
-                <td id="matrix-title" colspan="${size(o.y)}"><st:nbsp /></td>
+                <td class="matrix-title" colspan="${size(o.y)}"><st:nbsp /></td>
               </j:if>
               <j:forEach begin="1" end="${o.repeatX(loop.index)}">
                 <j:forEach var="v" items="${x.values}">

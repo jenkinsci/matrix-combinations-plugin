@@ -24,8 +24,6 @@
 
 package hudson.plugins.matrix_configuration_parameter;
 
-import static org.junit.Assert.*;
-
 import java.util.Arrays;
 
 import hudson.matrix.AxisList;
@@ -41,10 +39,8 @@ import hudson.model.ParametersDefinitionProperty;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Bug;
-import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
 
-import com.gargoylesoftware.htmlunit.html.HtmlCheckBoxInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 /**
@@ -52,7 +48,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
  */
 public class MatrixCombinationsParameterValueTest {
     @Rule
-    public JenkinsRule j = new JenkinsRule();
+    public MatrixCombinationsJenkinsRule j = new MatrixCombinationsJenkinsRule();
     
     @Test
     public void testParametersPageWithSingleAxis() throws Exception{
@@ -70,9 +66,9 @@ public class MatrixCombinationsParameterValueTest {
         WebClient wc = j.createWebClient();
         HtmlPage page = wc.getPage(b, "parameters");
         
-        assertTrue(((HtmlCheckBoxInput)page.getElementById("checkboxcombinations-axis1-value1")).isChecked());
-        assertFalse(((HtmlCheckBoxInput)page.getElementById("checkboxcombinations-axis1-value2")).isChecked());
-        assertTrue(((HtmlCheckBoxInput)page.getElementById("checkboxcombinations-axis1-value3")).isChecked());
+        j.assertCombinationChecked(page, true, axes, "value1");
+        j.assertCombinationChecked(page, false, axes, "value2");
+        j.assertCombinationChecked(page, true, axes, "value3");
     }
     
     @Test
@@ -95,10 +91,10 @@ public class MatrixCombinationsParameterValueTest {
         WebClient wc = j.createWebClient();
         HtmlPage page = wc.getPage(b, "parameters");
         
-        assertTrue(((HtmlCheckBoxInput)page.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-1")).isChecked());
-        assertFalse(((HtmlCheckBoxInput)page.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-2")).isChecked());
-        assertTrue(((HtmlCheckBoxInput)page.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-1")).isChecked());
-        assertTrue(((HtmlCheckBoxInput)page.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-2")).isChecked());
+        j.assertCombinationChecked(page, true, axes, "value1-1", "value2-1");
+        j.assertCombinationChecked(page, false, axes, "value1-1", "value2-2");
+        j.assertCombinationChecked(page, true, axes, "value1-2", "value2-1");
+        j.assertCombinationChecked(page, true, axes, "value1-2", "value2-2");
     }
     
     @Bug(27233)

@@ -39,11 +39,10 @@ import hudson.model.Result;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Bug;
+import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
 import org.jvnet.hudson.test.SleepBuilder;
 
-import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
-import com.gargoylesoftware.htmlunit.html.HtmlCheckBoxInput;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
@@ -173,9 +172,9 @@ public class MatrixCombinationsParameterDefinitionTest {
         HtmlPage page = wc.getPage(p, "build");
         HtmlForm form = page.getFormByName("parameters");
         
-        ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1")).setChecked(true);
-        ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value2")).setChecked(false);
-        ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value3")).setChecked(true);
+        j.checkCombination(page, true, axes, "value1");
+        j.checkCombination(page, false, axes, "value2");
+        j.checkCombination(page, true, axes, "value3");
         
         j.submit(form);
         
@@ -210,62 +209,57 @@ public class MatrixCombinationsParameterDefinitionTest {
         }
         WebClient wc = j.createAllow405WebClient();
         HtmlPage page = wc.getPage(p, "build");
-        HtmlForm form = page.getFormByName("parameters");
         
         // Successful link
         {
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1")).setChecked(false);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value2")).setChecked(true);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value3")).setChecked(true);
+            j.checkCombination(page, false, axes, "value1");
+            j.checkCombination(page, true, axes, "value2");
+            j.checkCombination(page, true, axes, "value3");
             
-            ((HtmlAnchor)page.getElementById("shortcut-combinations-successful")).click();
+            j.clickShortcut(page, "SUCCESS");
             
-            assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1")).isChecked());
-            assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value2")).isChecked());
-            assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value3")).isChecked());
-            
+            j.assertCombinationChecked(page, true, axes, "value1");
+            j.assertCombinationChecked(page, false, axes, "value2");
+            j.assertCombinationChecked(page, true, axes, "value3");
         }
  
         // Failed link
         {
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1")).setChecked(true);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value2")).setChecked(false);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value3")).setChecked(false);
+            j.checkCombination(page, true, axes, "value1");
+            j.checkCombination(page, false, axes, "value2");
+            j.checkCombination(page, false, axes, "value3");
             
-            ((HtmlAnchor)page.getElementById("shortcut-combinations-failed")).click();
+            j.clickShortcut(page, "FAILURE");
             
-            assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1")).isChecked());
-            assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value2")).isChecked());
-            assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value3")).isChecked());
-            
+            j.assertCombinationChecked(page, false, axes, "value1");
+            j.assertCombinationChecked(page, true, axes, "value2");
+            j.assertCombinationChecked(page, false, axes, "value3");
         }
         
         // All link
         {
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1")).setChecked(false);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value2")).setChecked(false);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value3")).setChecked(true);
+            j.checkCombination(page, false, axes, "value1");
+            j.checkCombination(page, false, axes, "value2");
+            j.checkCombination(page, true, axes, "value3");
             
-            ((HtmlAnchor)page.getElementById("shortcut-combinations-all")).click();
+            j.clickShortcut(page, "All");
             
-            assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1")).isChecked());
-            assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value2")).isChecked());
-            assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value3")).isChecked());
-            
+            j.assertCombinationChecked(page, true, axes, "value1");
+            j.assertCombinationChecked(page, true, axes, "value2");
+            j.assertCombinationChecked(page, true, axes, "value3");
         }
         
         // None link
         {
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1")).setChecked(true);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value2")).setChecked(true);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value3")).setChecked(false);
+            j.checkCombination(page, true, axes, "value1");
+            j.checkCombination(page, true, axes, "value2");
+            j.checkCombination(page, false, axes, "value3");
             
-            ((HtmlAnchor)page.getElementById("shortcut-combinations-none")).click();
+            j.clickShortcut(page, "None");
             
-            assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1")).isChecked());
-            assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value2")).isChecked());
-            assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value3")).isChecked());
-            
+            j.assertCombinationChecked(page, false, axes, "value1");
+            j.assertCombinationChecked(page, false, axes, "value2");
+            j.assertCombinationChecked(page, false, axes, "value3");
         }
     }
     
@@ -286,10 +280,10 @@ public class MatrixCombinationsParameterDefinitionTest {
         HtmlPage page = wc.getPage(p, "build");
         HtmlForm form = page.getFormByName("parameters");
         
-        ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-1")).setChecked(false);
-        ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-2")).setChecked(true);
-        ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-1")).setChecked(true);
-        ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-2")).setChecked(false);
+        j.checkCombination(page, false, axes, "value1-1", "value2-1");
+        j.checkCombination(page, true, axes, "value1-1", "value2-2");
+        j.checkCombination(page, true, axes, "value1-2", "value2-1");
+        j.checkCombination(page, false, axes, "value1-2", "value2-2");
         
         j.submit(form);
         
@@ -330,66 +324,65 @@ public class MatrixCombinationsParameterDefinitionTest {
         }
         WebClient wc = j.createAllow405WebClient();
         HtmlPage page = wc.getPage(p, "build");
-        HtmlForm form = page.getFormByName("parameters");
         
         // Successful link
         {
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-1")).setChecked(true);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-2")).setChecked(false);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-1")).setChecked(true);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-2")).setChecked(false);
+            j.checkCombination(page, true, axes, "value1-1", "value2-1");
+            j.checkCombination(page, false, axes, "value1-1", "value2-2");
+            j.checkCombination(page, true, axes, "value1-2", "value2-1");
+            j.checkCombination(page, false, axes, "value1-2", "value2-2");
             
-            ((HtmlAnchor)page.getElementById("shortcut-combinations-successful")).click();
+            j.clickShortcut(page, "SUCCESS");
             
-            assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-1")).isChecked());
-            assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-2")).isChecked());
-            assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-1")).isChecked());
-            assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-2")).isChecked());
+            j.assertCombinationChecked(page, true, axes, "value1-1", "value2-1");
+            j.assertCombinationChecked(page, false, axes, "value1-1", "value2-2");
+            j.assertCombinationChecked(page, true, axes, "value1-2", "value2-1");
+            j.assertCombinationChecked(page, true, axes, "value1-2", "value2-2");
         }
         
         // Failed link
         {
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-1")).setChecked(false);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-2")).setChecked(true);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-1")).setChecked(false);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-2")).setChecked(true);
+            j.checkCombination(page, false, axes, "value1-1", "value2-1");
+            j.checkCombination(page, true, axes, "value1-1", "value2-2");
+            j.checkCombination(page, false, axes, "value1-2", "value2-1");
+            j.checkCombination(page, true, axes, "value1-2", "value2-2");
             
-            ((HtmlAnchor)page.getElementById("shortcut-combinations-failed")).click();
+            j.clickShortcut(page, "FAILURE");
             
-            assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-1")).isChecked());
-            assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-2")).isChecked());
-            assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-1")).isChecked());
-            assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-2")).isChecked());
+            j.assertCombinationChecked(page, false, axes, "value1-1", "value2-1");
+            j.assertCombinationChecked(page, true, axes, "value1-1", "value2-2");
+            j.assertCombinationChecked(page, false, axes, "value1-2", "value2-1");
+            j.assertCombinationChecked(page, false, axes, "value1-2", "value2-2");
         }
         
         // All link
         {
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-1")).setChecked(false);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-2")).setChecked(true);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-1")).setChecked(false);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-2")).setChecked(true);
+            j.checkCombination(page, false, axes, "value1-1", "value2-1");
+            j.checkCombination(page, true, axes, "value1-1", "value2-2");
+            j.checkCombination(page, false, axes, "value1-2", "value2-1");
+            j.checkCombination(page, true, axes, "value1-2", "value2-2");
             
-            ((HtmlAnchor)page.getElementById("shortcut-combinations-all")).click();
+            j.clickShortcut(page, "All");
             
-            assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-1")).isChecked());
-            assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-2")).isChecked());
-            assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-1")).isChecked());
-            assertTrue(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-2")).isChecked());
+            j.assertCombinationChecked(page, true, axes, "value1-1", "value2-1");
+            j.assertCombinationChecked(page, true, axes, "value1-1", "value2-2");
+            j.assertCombinationChecked(page, true, axes, "value1-2", "value2-1");
+            j.assertCombinationChecked(page, true, axes, "value1-2", "value2-2");
         }
         
         // None link
         {
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-1")).setChecked(false);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-2")).setChecked(true);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-1")).setChecked(false);
-            ((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-2")).setChecked(true);
+            j.checkCombination(page, false, axes, "value1-1", "value2-1");
+            j.checkCombination(page, true, axes, "value1-1", "value2-2");
+            j.checkCombination(page, false, axes, "value1-2", "value2-1");
+            j.checkCombination(page, true, axes, "value1-2", "value2-2");
             
-            ((HtmlAnchor)page.getElementById("shortcut-combinations-none")).click();
+            j.clickShortcut(page, "None");
             
-            assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-1")).isChecked());
-            assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-1-axis2-value2-2")).isChecked());
-            assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-1")).isChecked());
-            assertFalse(((HtmlCheckBoxInput)form.getElementById("checkboxcombinations-axis1-value1-2-axis2-value2-2")).isChecked());
+            j.assertCombinationChecked(page, false, axes, "value1-1", "value2-1");
+            j.assertCombinationChecked(page, false, axes, "value1-1", "value2-2");
+            j.assertCombinationChecked(page, false, axes, "value1-2", "value2-1");
+            j.assertCombinationChecked(page, false, axes, "value1-2", "value2-2");
         }
     }
     
@@ -465,5 +458,103 @@ public class MatrixCombinationsParameterDefinitionTest {
         
         // default trigger
         j.assertBuildStatusSuccess(p.scheduleBuild2(0));
+    }
+
+    @Issue("JENKINS-36861")
+    @Test
+    public void testNotBuilt() throws Exception {
+        AxisList axes = new AxisList(new TextAxis("axis1", "value1", "value2", "value3"));
+        MatrixProject p = j.createMatrixProject();
+        p.setAxes(axes);
+        p.addProperty(new ParametersDefinitionProperty(
+            new MatrixCombinationsParameterDefinition("combinations", "", "")
+        ));
+        p.getBuildersList().add(new ConditionalFailBuilder("${axis1}", "value2"));
+        p.setCombinationFilter("axis1 != 'value3'");
+
+        MatrixBuild b = p.scheduleBuild2(0).get();
+
+        j.assertBuildStatus(Result.SUCCESS, b.getExactRun(new Combination(axes, "value1")));
+        j.assertBuildStatus(Result.FAILURE, b.getExactRun(new Combination(axes, "value2")));
+        assertNull(b.getExactRun(new Combination(axes, "value3")));
+
+        p.setCombinationFilter("");
+
+        WebClient wc = j.createAllow405WebClient();
+        HtmlPage page = wc.getPage(p, "build");
+
+        j.clickShortcut(page, "SUCCESS");
+        j.assertCombinationChecked(page, true, axes, "value1");
+        j.assertCombinationChecked(page, false, axes, "value2");
+        j.assertCombinationChecked(page, false, axes, "value3");
+
+        j.clickShortcut(page, "FAILURE");
+        j.assertCombinationChecked(page, false, axes, "value1");
+        j.assertCombinationChecked(page, true, axes, "value2");
+        j.assertCombinationChecked(page, false, axes, "value3");
+
+        j.clickShortcut(page, "All");
+        j.assertCombinationChecked(page, true, axes, "value1");
+        j.assertCombinationChecked(page, true, axes, "value2");
+        j.assertCombinationChecked(page, true, axes, "value3");
+    }
+
+    @Issue("JENKINS-30918")
+    @Test
+    public void testMultiParameters() throws Exception {
+        AxisList axes = new AxisList(new TextAxis("axis1", "value1", "value2", "value3"));
+        MatrixProject p = j.createMatrixProject();
+        p.setAxes(axes);
+        p.addProperty(new ParametersDefinitionProperty(
+            new MatrixCombinationsParameterDefinition("combinations1", "", ""),
+            new MatrixCombinationsParameterDefinition("combinations2", "", "")
+        ));
+        p.setCombinationFilter("axis1 != 'value3'");
+
+        WebClient wc = j.createAllow405WebClient();
+        HtmlPage page = wc.getPage(p, "build");
+
+        j.assertCombinationChecked(page, 0, true, axes, "value1");
+        j.assertCombinationChecked(page, 0, true, axes, "value2");
+        j.assertCombinationChecked(page, 0, false, axes, "value3");
+        j.assertCombinationChecked(page, 1, true, axes, "value1");
+        j.assertCombinationChecked(page, 1, true, axes, "value2");
+        j.assertCombinationChecked(page, 1, false, axes, "value3");
+
+        j.clickShortcut(page, 1, "None");
+
+        j.assertCombinationChecked(page, 0, true, axes, "value1");
+        j.assertCombinationChecked(page, 0, true, axes, "value2");
+        j.assertCombinationChecked(page, 0, false, axes, "value3");
+        j.assertCombinationChecked(page, 1, false, axes, "value1");
+        j.assertCombinationChecked(page, 1, false, axes, "value2");
+        j.assertCombinationChecked(page, 1, false, axes, "value3");
+
+        j.clickShortcut(page, 0, "None");
+
+        j.assertCombinationChecked(page, 0, false, axes, "value1");
+        j.assertCombinationChecked(page, 0, false, axes, "value2");
+        j.assertCombinationChecked(page, 0, false, axes, "value3");
+        j.assertCombinationChecked(page, 1, false, axes, "value1");
+        j.assertCombinationChecked(page, 1, false, axes, "value2");
+        j.assertCombinationChecked(page, 1, false, axes, "value3");
+
+        j.clickShortcut(page, 1, "All");
+
+        j.assertCombinationChecked(page, 0, false, axes, "value1");
+        j.assertCombinationChecked(page, 0, false, axes, "value2");
+        j.assertCombinationChecked(page, 0, false, axes, "value3");
+        j.assertCombinationChecked(page, 1, true, axes, "value1");
+        j.assertCombinationChecked(page, 1, true, axes, "value2");
+        j.assertCombinationChecked(page, 1, false, axes, "value3");
+
+        j.clickShortcut(page, 0, "All");
+
+        j.assertCombinationChecked(page, 0, true, axes, "value1");
+        j.assertCombinationChecked(page, 0, true, axes, "value2");
+        j.assertCombinationChecked(page, 0, false, axes, "value3");
+        j.assertCombinationChecked(page, 1, true, axes, "value1");
+        j.assertCombinationChecked(page, 1, true, axes, "value2");
+        j.assertCombinationChecked(page, 1, false, axes, "value3");
     }
 }

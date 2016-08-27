@@ -1,7 +1,7 @@
 <!--
 The MIT License
 
-Copyright (c) 2012, Piotr Skotnicki
+Copyright (c) 2016 IKEDA Yasuyuki
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,24 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
-    xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form"
-    xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
-    <f:entry title="${%Name}" help="/help/parameter/name.html">
-        <f:textbox field="name" />
-    </f:entry>
-    <f:entry title="${%Description}" help="/help/parameter/description.html">
-        <f:textarea field="description" />
-    </f:entry>
-    <f:advanced>
-        <f:entry field="defaultCombinationFilter" title="${%Default Filter}">
-          <f:textbox />
-        </f:entry>
-        <f:entry field="shortcutList" title="${%Shortcut links}">
-          <f:hetero-list name="shortcutList" hasHeader="true"
-            descriptors="${descriptor.shortcutDescriptorList}"
-            items="${(instance != null) ? instance.shortcutList : descriptor.defaultShortcutList}"
-            addCaption="${%Add Shortcut link}" />
-        </f:entry>
-    </f:advanced>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+  <f:entry field="name" title="${%Name}">
+    <f:textbox />
+  </f:entry>
+  <f:entry field="combinationFilter" title="${%Combination filter}">
+    <f:textbox />
+  </f:entry>
 </j:jelly>

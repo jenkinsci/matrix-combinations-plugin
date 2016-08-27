@@ -24,10 +24,19 @@
 
 package hudson.plugins.matrix_configuration_parameter;
 
+import static org.junit.Assert.assertEquals;
+
 import org.apache.commons.httpclient.HttpStatus;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import com.gargoylesoftware.htmlunit.WebResponse;
+import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
+import com.gargoylesoftware.htmlunit.html.HtmlCheckBoxInput;
+import com.gargoylesoftware.htmlunit.html.HtmlElement;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
+
+import hudson.matrix.AxisList;
+import hudson.matrix.Combination;
 
 /**
  *
@@ -64,5 +73,44 @@ public class MatrixCombinationsJenkinsRule extends JenkinsRule {
                 super.printContentIfNecessary(webResponse);
             }
         };
+    }
+
+    public void checkCombination(HtmlPage page, boolean checked, AxisList axes, String... values) throws Exception {
+        checkCombination(page, 0, checked, axes, values);
+    }
+
+    public void checkCombination(HtmlPage page, int index, boolean checked, AxisList axes, String... values) throws Exception {
+        page.<HtmlElement>selectNodes("//*[@class='matrix-combinations-parameter']").get(index)
+            .<HtmlCheckBoxInput>selectNodes(String.format(
+                "//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, values).toIndex(axes)
+            )).get(0).setChecked(checked);
+    }
+
+    public void clickShortcut(HtmlPage page, String name) throws Exception {
+        clickShortcut(page, 0, name);
+    }
+
+    public void clickShortcut(HtmlPage page, int index, String name) throws Exception {
+        page.<HtmlElement>selectNodes("//*[@class='matrix-combinations-parameter']").get(index)
+            .<HtmlAnchor>selectNodes(String.format(
+                ".//a[@data-shortcut-id='%s']",
+                name
+            )).get(0).click();
+    }
+
+    public void assertCombinationChecked(HtmlPage page, boolean checked, AxisList axes, String... values) throws Exception {
+        assertCombinationChecked(page, 0, checked, axes, values);
+    }
+
+    public void assertCombinationChecked(HtmlPage page, int index, boolean checked, AxisList axes, String... values) throws Exception {
+        assertEquals(
+            checked,
+            page.<HtmlElement>selectNodes("//*[@class='matrix-combinations-parameter']").get(index)
+                .<HtmlCheckBoxInput>selectNodes(String.format(
+                    ".//*[@data-combination='%s']//input[@type='checkbox']",
+                    new Combination(axes, values).toIndex(axes)
+                )).get(0).isChecked()
+        );
     }
 }
