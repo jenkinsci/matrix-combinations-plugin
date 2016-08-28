@@ -43,8 +43,9 @@ import com.google.common.collect.Lists;
 
 
 public class MatrixCombinationsParameterValue extends ParameterValue {
+    private static final long serialVersionUID = 1L;
 
-    private final List<String> combinations;
+    private List<String> combinations;
 
     @Deprecated
     transient Boolean[] values;
@@ -95,21 +96,22 @@ public class MatrixCombinationsParameterValue extends ParameterValue {
         return combinations;
     }
 
-    private Object readResolve() {
+    protected Object readResolve() {
         if (combinations == null) {
             // < 1.1.0
-            return new MatrixCombinationsParameterValue(
-                getName(),
-                getValues(),
-                getConfs(),
-                getDescription()
-            );
+            this.combinations = convertValuesAndConfs(this.values, this.confs);
+            this.confs = null;
+            this.values = null;
         }
         return this;
     }
 
     private static List<String> convertValuesAndConfs(Boolean[] values, String[] confs) {
         List<String> ret = new ArrayList<String>();
+
+        if (values == null || confs == null) {
+            return ret;
+        }
 
         for (int i = 0; i < values.length; ++i) {
             if (values[i] != null && values[i]) {
@@ -180,7 +182,7 @@ public class MatrixCombinationsParameterValue extends ParameterValue {
         StringBuffer valueStr= new StringBuffer("");
         valueStr.append("(MatrixCombinationsParameterValue) " + getName()+"\n");
         for (String combination: getCombinations()) {
-            valueStr.append(String.format("%s\n", combination));
+            valueStr.append(String.format("%s%n", combination));
         }
         return valueStr.toString();
     }
