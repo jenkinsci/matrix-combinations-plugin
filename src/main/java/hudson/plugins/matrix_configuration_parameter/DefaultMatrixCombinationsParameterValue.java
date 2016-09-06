@@ -33,18 +33,27 @@ import hudson.util.VariableResolver;
  * {@link MatrixCombinationsParameterValue} created when the build started
  * without specifying parameter.
  * 
- * {@link MatrixCombinationsParameterValue#getConfs()} and {@link MatrixCombinationsParameterValue#getValues()}
- * does not work (always return an empty array).
+ * {@link MatrixCombinationsParameterValue#getCombinations()}
+ * does not work (always return an empty list).
  */
 public class DefaultMatrixCombinationsParameterValue extends MatrixCombinationsParameterValue {
     private static final long serialVersionUID = -812826069693143705L;
     private final String combinationFilter;
     
     public DefaultMatrixCombinationsParameterValue(String name, String description, String combinationFilter) {
-        super(name, new Boolean[0], new String[0], description);
+        super(name, description, null);
         this.combinationFilter = combinationFilter;
     }
     
+
+    /**
+     * @return combination filter
+     * @since 1.1.0
+     */
+    public String getCombinationFilter() {
+        return combinationFilter;
+    }
+
     @Override
     public VariableResolver<String> createVariableResolver(AbstractBuild<?, ?> build) {
         return new VariableResolver<String>() {
@@ -72,7 +81,7 @@ public class DefaultMatrixCombinationsParameterValue extends MatrixCombinationsP
         }
         return c.evalGroovyExpression(axes, combinationFilter);
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {

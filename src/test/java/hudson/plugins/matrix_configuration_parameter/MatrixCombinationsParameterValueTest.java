@@ -24,7 +24,11 @@
 
 package hudson.plugins.matrix_configuration_parameter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import java.util.Arrays;
+import java.util.Collections;
 
 import hudson.matrix.AxisList;
 import hudson.matrix.MatrixBuild;
@@ -35,6 +39,7 @@ import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.ParametersAction;
 import hudson.model.ParametersDefinitionProperty;
+import jenkins.model.Jenkins;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -114,5 +119,59 @@ public class MatrixCombinationsParameterValueTest {
         
         WebClient wc = j.createWebClient();
         wc.getPage(b, "parameters");
+    }
+
+    @Test
+    public void testReadResolve() throws Exception {
+        final String SERIALIZED = 
+            "<hudson.plugins.matrix__configuration__parameter.MatrixCombinationsParameterValue>"
+                + "<name>combinations</name>"
+                + "<description>test</description>"
+                + "<values>"
+                    + "<boolean>true</boolean>"
+                    + "<boolean>false</boolean>"
+                    + "<boolean>true</boolean>"
+                + "</values>"
+                + "<confs>"
+                    + "<string>axis1=value1</string>"
+                    + "<string>axis1=value2</string>"
+                    + "<string>axis1=value3</string>"
+                + "</confs>"
+            + "</hudson.plugins.matrix__configuration__parameter.MatrixCombinationsParameterValue>";
+        MatrixCombinationsParameterValue v = (MatrixCombinationsParameterValue)Jenkins.XSTREAM2.fromXML(SERIALIZED);
+        assertEquals("combinations", v.getName());
+        assertEquals("test", v.getDescription());
+        assertNull(v.getValues());
+        assertNull(v.getConfs());
+        assertEquals(
+            Arrays.asList(
+                "axis1=value1",
+                "axis1=value3"
+            ),
+            v.getCombinations()
+        );
+    }
+
+    @Test
+    public void testReadResolveOfDefaultMatrixCombinationsParameterValue() throws Exception {
+        final String SERIALIZED = 
+            "<hudson.plugins.matrix__configuration__parameter.DefaultMatrixCombinationsParameterValue>"
+                + "<name>combinations</name>"
+                + "<description>test</description>"
+                + "<combinationFilter>axis1 != &apos;value2&apos;</combinationFilter>"
+            + "</hudson.plugins.matrix__configuration__parameter.DefaultMatrixCombinationsParameterValue>";
+        DefaultMatrixCombinationsParameterValue v = (DefaultMatrixCombinationsParameterValue)Jenkins.XSTREAM2.fromXML(SERIALIZED);
+        assertEquals("combinations", v.getName());
+        assertEquals("test", v.getDescription());
+        assertNull(v.getValues());
+        assertNull(v.getConfs());
+        assertEquals(
+            Collections.emptyList(),
+            v.getCombinations()
+        );
+        assertEquals(
+            "axis1 != 'value2'",
+            v.getCombinationFilter()
+        );
     }
 }
