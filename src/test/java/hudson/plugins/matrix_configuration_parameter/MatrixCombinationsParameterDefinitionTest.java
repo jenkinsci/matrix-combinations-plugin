@@ -26,6 +26,8 @@ package hudson.plugins.matrix_configuration_parameter;
 
 import static org.junit.Assert.*;
 
+import java.net.URLEncoder;
+
 import hudson.cli.CLI;
 import hudson.matrix.AxisList;
 import hudson.matrix.Combination;
@@ -579,6 +581,31 @@ public class MatrixCombinationsParameterDefinitionTest {
             "combinations=axis1 in ['value1', 'value3']"
         );
         assertEquals(0, ret);
+
+        j.waitUntilNoActivity();
+
+        MatrixBuild b = p.getLastBuild();
+        j.assertBuildStatusSuccess(b);
+
+        assertNotNull(b.getExactRun(new Combination(axes, "value1")));
+        assertNull(b.getExactRun(new Combination(axes, "value2")));
+        assertNotNull(b.getExactRun(new Combination(axes, "value3")));
+    }
+
+    @Test
+    public void testBuildWithParameters() throws Exception {
+        AxisList axes = new AxisList(new TextAxis("axis1", "value1", "value2", "value3"));
+        MatrixProject p = j.createMatrixProject();
+        p.setAxes(axes);
+        p.addProperty(new ParametersDefinitionProperty(
+            new MatrixCombinationsParameterDefinition("combinations", "", "")
+        ));
+
+        WebClient wc = j.createWebClient();
+        wc.getPage(p, String.format(
+            "/buildWithParameters?combinations=%s",
+            URLEncoder.encode("axis1 in ['value1', 'value3']", "UTF-8")
+        ));
 
         j.waitUntilNoActivity();
 

@@ -24,16 +24,13 @@
 package hudson.plugins.matrix_configuration_parameter;
 
 import hudson.Extension;
-import hudson.cli.CLICommand;
-import hudson.model.ParameterDefinition;
-import hudson.model.ParameterValue;
 import hudson.model.Result;
+import hudson.model.SimpleParameterDefinition;
 import hudson.plugins.matrix_configuration_parameter.shortcut.MatrixCombinationsShortcut;
 import hudson.plugins.matrix_configuration_parameter.shortcut.MatrixCombinationsShortcutDescriptor;
 import hudson.plugins.matrix_configuration_parameter.shortcut.ResultShortcut;
 import net.sf.json.JSONObject;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,7 +43,7 @@ import org.kohsuke.stapler.StaplerRequest;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 
-public class MatrixCombinationsParameterDefinition extends ParameterDefinition {
+public class MatrixCombinationsParameterDefinition extends SimpleParameterDefinition {
 
     private static final long serialVersionUID = 1L;
     private final String defaultCombinationFilter;
@@ -115,39 +112,17 @@ public class MatrixCombinationsParameterDefinition extends ParameterDefinition {
     }
 
     @Override
-    public ParameterValue createValue(StaplerRequest req, JSONObject jo) {
+    public MatrixCombinationsParameterValue createValue(StaplerRequest req, JSONObject jo) {
         MatrixCombinationsParameterValue value = req.bindJSON(MatrixCombinationsParameterValue.class, jo);
         value.setDescription(getDescription());
         return value;
-    }
-
-    @Override
-    public ParameterValue createValue(StaplerRequest req) {
-        String[] value = req.getParameterValues(getName());
-        if (value == null || value.length < 1) {
-            return getDefaultParameterValue();
-        } else {
-            return new MatrixCombinationsParameterValue(getName(),new Boolean[]{},new String[]{});
-        }
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ParameterValue createValue(CLICommand command, String value) throws IOException, InterruptedException {
-        return createValue(value);
-    }
-
-    /**
-     * Decide combinations from combinations filter
-     *
-     * @param value groovy expression for combinations filter
-     * @return matrix-combinations parameter with the specified combinations filter
-     *
-     * @since 1.1.0
-     */
-    protected ParameterValue createValue(String value) throws IOException, InterruptedException {
+    public MatrixCombinationsParameterValue createValue(String value) {
         return new DefaultMatrixCombinationsParameterValue(
             getName(),
             getDescription(),
@@ -157,8 +132,7 @@ public class MatrixCombinationsParameterDefinition extends ParameterDefinition {
 
     @Override
     public MatrixCombinationsParameterValue getDefaultParameterValue() {
-        MatrixCombinationsParameterValue v = new DefaultMatrixCombinationsParameterValue(getName(), getDescription(), getDefaultCombinationFilter());
-        return v;
+        return createValue(getDefaultCombinationFilter());
     }
 
     @Extension
