@@ -46,10 +46,6 @@ Layouter layouter = new Layouter<Combination>(axes) {
 drawMainBody(paramDef, f, nameIt, axes, project, project.lastBuild, layouter)
 
 private void drawMainBody(MatrixCombinationsParameterDefinition paramDef, Namespace f, String nameIt, AxisList axes,MatrixProject project,MatrixBuild build,Layouter layouter) {
-
-    drawMainLinksJS(nameIt)
-
-
     f.entry(title: nameIt, description: it.getDescription()) {
         div(name: "parameter", class: "matrix-combinations-parameter") {
             input(type: "hidden", name: "name", value: nameIt)
