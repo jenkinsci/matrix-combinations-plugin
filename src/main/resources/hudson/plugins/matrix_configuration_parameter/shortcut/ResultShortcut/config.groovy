@@ -36,7 +36,7 @@ f.entry(field: "resultsToCheck", title: _("Results to check")) {
     for (Result r: [Result.SUCCESS, Result.UNSTABLE, Result.FAILURE, Result.NOT_BUILT, Result.ABORTED]) {
         f.checkbox(
             json: r.toString(),
-            checked: instance.resultsToCheck.contains(r.toString()),
+            checked: instance?instance.resultsToCheck.contains(r.toString()):false,
             title: r.toString()
         );
     }
