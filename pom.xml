@@ -21,9 +21,9 @@
   </scm>
 
     <properties>
-        <jenkins.version>1.509</jenkins.version>
-        <jenkins-test-harness.version>1.509</jenkins-test-harness.version>
-        <java.level>5</java.level>
+        <jenkins.version>1.532</jenkins.version> <!-- ParameterDefinition#getFormattedDescription is since 1.520 -->
+        <jenkins-test-harness.version>1.532</jenkins-test-harness.version>
+        <java.level>6</java.level>
     </properties>
 
 	<repositories>
@@ -65,35 +65,6 @@
           <!-- jenkins-test-harness < 1.545 doesn't support concurrent tests. -->
           <forkCount>1</forkCount>
         </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>display-info</id>
-            <configuration>
-              <rules>
-                <bannedDependencies>
-                  <excludes>
-                    <!-- <exclude>org.sonatype.sisu:sisu-guice</exclude> -->
-                    <exclude>log4j:log4j:*:jar:compile</exclude>
-                    <exclude>log4j:log4j:*:jar:runtime</exclude>
-                    <exclude>commons-logging:commons-logging:*:jar:compile</exclude>
-                    <exclude>commons-logging:commons-logging:*:jar:runtime</exclude>
-                  </excludes>
-                </bannedDependencies>
-                <enforceBytecodeVersion>
-                  <excludes combine.children="append">
-                    <exclude>com.sonyericsson.hudson.plugins.rebuild:rebuild</exclude>
-                    <!-- dependencies via jenkins-core-1.509 -->
-                    <exclude>org.mindrot:jbcrypt</exclude>
-                    <exclude>org.kohsuke:asm3</exclude>
-                  </excludes>
-                </enforceBytecodeVersion>
-              </rules>
-          </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>

@@ -23,17 +23,22 @@
  */
 package hudson.plugins.matrix_configuration_parameter;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 
+import hudson.markup.MarkupFormatter;
 import hudson.matrix.AxisList;
 import hudson.matrix.Combination;
 import hudson.model.*;
 
 import hudson.util.VariableResolver;
+import jenkins.model.Jenkins;
 
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -44,6 +49,8 @@ import com.google.common.collect.Lists;
 
 public class MatrixCombinationsParameterValue extends ParameterValue {
     private static final long serialVersionUID = 1L;
+
+    private static final Logger LOGGER = Logger.getLogger(MatrixCombinationsParameterValue.class.getName());
 
     private List<String> combinations;
 
@@ -186,4 +193,25 @@ public class MatrixCombinationsParameterValue extends ParameterValue {
         }
         return valueStr.toString();
     }
+
+    /**
+     * return parameter description, applying the configured {@link MarkupFormatter} for jenkins instance.
+     *
+     * This is a backport from Jenkins-2.44 or Jenkins-2.32.2.
+     *
+     * @since 1.2.0
+     */
+    public String getFormattedDescription() {
+        try {
+            return Jenkins.getInstance().getMarkupFormatter().translate(getDescription());
+        } catch (IOException e) {
+            LOGGER.log(
+                Level.WARNING,
+                "failed to translate description using configured markup formatter: {0}",
+                getDescription()
+            );
+            return "";
+        }
+    }
+
 }

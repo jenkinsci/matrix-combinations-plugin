@@ -23,7 +23,8 @@ String nameIt = it.getName();
 MatrixProject project = request.findAncestorObject(MatrixProject.class);
 if (project == null) {
    //in case project is not a Matrix Project
-    f.entry(title: nameIt, description: it.getDescription()) {
+    set("escapeEntryTitleAndDescription", false);
+    f.entry(title: h.escape(nameIt), description: it.formattedDescription) {
         div(name: "parameter") {
             input(type: "hidden", name: "name", value: nameIt)
             text(_("Not applicable. Applicable only to multi-configuration projects."))
@@ -46,7 +47,8 @@ Layouter layouter = new Layouter<Combination>(axes) {
 drawMainBody(paramDef, f, nameIt, axes, project, project.lastBuild, layouter)
 
 private void drawMainBody(MatrixCombinationsParameterDefinition paramDef, Namespace f, String nameIt, AxisList axes,MatrixProject project,MatrixBuild build,Layouter layouter) {
-    f.entry(title: nameIt, description: it.getDescription()) {
+    set("escapeEntryTitleAndDescription", false);
+    f.entry(title: h.escape(nameIt), description: it.formattedDescription) {
         div(name: "parameter", class: "matrix-combinations-parameter") {
             input(type: "hidden", name: "name", value: nameIt)
             nsProject.matrix(it: project, layouter: layouter) {
