@@ -29,7 +29,7 @@ THE SOFTWARE.
         <f:textbox field="name" />
     </f:entry>
     <f:entry title="${%Description}" help="/help/parameter/description.html">
-        <f:textarea field="description" codemirror-mode="${app.markupFormatter.codeMirrorMode}" codemirror-config="${app.markupFormatter.codeMirrorConfig}" previewEndpoint="/markupFormatter/previewDescription" />
+        <f:textarea field="description" previewEndpoint="/markupFormatter/previewDescription" />
     </f:entry>
     <f:advanced>
         <f:entry field="defaultCombinationFilter" title="${%Default Filter}">
