@@ -25,6 +25,7 @@
 package hudson.plugins.matrix_configuration_parameter;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.util.Arrays;
@@ -41,9 +42,11 @@ import hudson.model.ParametersAction;
 import hudson.model.ParametersDefinitionProperty;
 import jenkins.model.Jenkins;
 
+import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Bug;
+import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
 
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
@@ -173,5 +176,51 @@ public class MatrixCombinationsParameterValueTest {
             "axis1 != 'value2'",
             v.getCombinationFilter()
         );
+    }
+
+    @Issue("JENKINS-42902")
+    @Test
+    public void testSafeTitle() throws Exception {
+        AxisList axes = new AxisList(new TextAxis("axis1", "value1", "value2", "value3"));
+        MatrixProject p = j.createMatrixProject();
+        p.setAxes(axes);
+        p.addProperty(new ParametersDefinitionProperty(
+                new MatrixCombinationsParameterDefinition(
+                    "<span id=\"test-not-expected\">combinations</span>",
+                    ""
+                )
+        ));
+
+        MatrixBuild b = j.assertBuildStatusSuccess(p.scheduleBuild2(0).get());
+
+        WebClient wc = j.createWebClient();
+        HtmlPage page = wc.getPage(b, "parameters");
+
+        assertNull(page.getElementById("test-not-expected"));
+    }
+
+    @Issue("JENKINS-42902")
+    @Test
+    public void testSafeDescription() throws Exception {
+        Assume.assumeNotNull(j.jenkins.getMarkupFormatter());
+
+        AxisList axes = new AxisList(new TextAxis("axis1", "value1", "value2", "value3"));
+        MatrixProject p = j.createMatrixProject();
+        p.setAxes(axes);
+        p.addProperty(new ParametersDefinitionProperty(
+                new MatrixCombinationsParameterDefinition(
+                    "combinations",
+                    "<span id=\"test-expected\">blahblah</span>"
+                        + "<script id=\"test-not-expected\"></script>"
+                )
+        ));
+
+        MatrixBuild b = j.assertBuildStatusSuccess(p.scheduleBuild2(0).get());
+
+        WebClient wc = j.createWebClient();
+        HtmlPage page = wc.getPage(b, "parameters");
+
+        assertNotNull(page.getElementById("test-expected"));
+        assertNull(page.getElementById("test-not-expected"));
     }
 }

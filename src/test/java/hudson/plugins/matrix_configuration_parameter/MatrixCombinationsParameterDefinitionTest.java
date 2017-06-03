@@ -40,6 +40,7 @@ import hudson.model.ParametersDefinitionProperty;
 import hudson.model.queue.QueueTaskFuture;
 import hudson.model.Result;
 
+import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Bug;
@@ -615,5 +616,47 @@ public class MatrixCombinationsParameterDefinitionTest {
         assertNotNull(b.getExactRun(new Combination(axes, "value1")));
         assertNull(b.getExactRun(new Combination(axes, "value2")));
         assertNotNull(b.getExactRun(new Combination(axes, "value3")));
+    }
+
+    @Issue("JENKINS-42902")
+    @Test
+    public void testSafeTitle() throws Exception {
+        AxisList axes = new AxisList(new TextAxis("axis1", "value1", "value2", "value3"));
+        MatrixProject p = j.createMatrixProject();
+        p.setAxes(axes);
+        p.addProperty(new ParametersDefinitionProperty(
+            new MatrixCombinationsParameterDefinition(
+                "<span id=\"test-not-expected\">combinations</span>",
+                ""
+            )
+        ));
+
+        WebClient wc = j.createAllow405WebClient();
+        HtmlPage page = wc.getPage(p, "build");
+
+        assertNull(page.getElementById("test-not-expected"));
+    }
+
+    @Issue("JENKINS-42902")
+    @Test
+    public void testSafeDescription() throws Exception {
+        Assume.assumeNotNull(j.jenkins.getMarkupFormatter());
+
+        AxisList axes = new AxisList(new TextAxis("axis1", "value1", "value2", "value3"));
+        MatrixProject p = j.createMatrixProject();
+        p.setAxes(axes);
+        p.addProperty(new ParametersDefinitionProperty(
+            new MatrixCombinationsParameterDefinition(
+                "combinations",
+                "<span id=\"test-expected\">blahblah</span>"
+                + "<script id=\"test-not-expected\"></script>"
+            )
+        ));
+
+        WebClient wc = j.createAllow405WebClient();
+        HtmlPage page = wc.getPage(p, "build");
+
+        assertNotNull(page.getElementById("test-expected"));
+        assertNull(page.getElementById("test-not-expected"));
     }
 }

@@ -24,7 +24,8 @@ MatrixProject project = request.findAncestorObject(MatrixProject.class);
 MatrixBuild build = request.findAncestorObject(MatrixBuild.class);
 if (project == null || build == null) {
     //in case you are looking at a specific run, MatrixRun Ancestor will replace the MatrixBuild
-    f.entry(title: valueIt.getName(), description: it.getDescription()) {
+    set("escapeEntryTitleAndDescription", false);
+    f.entry(title: h.escape(valueIt.name), description: it.formattedDescription) {
         // In the case the parameter is not defined in this project,
         // sending parameters cause rebuild-plugin throws exception.
         // Acts as if I'm not here.
@@ -49,7 +50,8 @@ drawParameterBody(parameterDefinition, f, valueIt, axes, project, build, layoute
 
 
 private void drawParameterBody(MatrixCombinationsParameterDefinition paramDef, Namespace f,valueIt,AxisList axes,MatrixProject project,MatrixBuild build,Layouter layouter) {
-    f.entry(title: valueIt.getName(), description: it.getDescription()) {
+    set("escapeEntryTitleAndDescription", false);
+    f.entry(title: h.escape(valueIt.name), description: it.formattedDescription) {
         div(name: "parameter", class: "matrix-combinations-parameter") {
             input(type: "hidden", name: "name", value: valueIt.getName())
             nsProject.matrix(it: build, layouter: layouter) {
