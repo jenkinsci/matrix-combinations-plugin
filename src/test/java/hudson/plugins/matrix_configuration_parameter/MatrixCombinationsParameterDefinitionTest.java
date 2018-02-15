@@ -26,8 +26,11 @@ package hudson.plugins.matrix_configuration_parameter;
 
 import static org.junit.Assert.*;
 
+import java.net.URL;
 import java.net.URLEncoder;
 
+import com.gargoylesoftware.htmlunit.HttpMethod;
+import com.gargoylesoftware.htmlunit.WebRequest;
 import hudson.cli.CLI;
 import hudson.markup.RawHtmlMarkupFormatter;
 import hudson.matrix.AxisList;
@@ -575,12 +578,8 @@ public class MatrixCombinationsParameterDefinitionTest {
 
         CLI cli = new CLI(j.getURL());
         int ret = cli.execute(
-            "build",
-            p.getFullName(),
-            "-p",
-            // You can't use axis1 != 'value2'
-            // for JENKINS-21160 (fixed in Jenkins 1.606)
-            "combinations=axis1 in ['value1', 'value3']"
+            "build", p.getFullName(),
+            "-p", "combinations=axis1 != 'value2'"
         );
         assertEquals(0, ret);
 
@@ -604,10 +603,10 @@ public class MatrixCombinationsParameterDefinitionTest {
         ));
 
         WebClient wc = j.createWebClient();
-        wc.getPage(p, String.format(
-            "/buildWithParameters?combinations=%s",
-            URLEncoder.encode("axis1 in ['value1', 'value3']", "UTF-8")
-        ));
+        URL url = new URL(wc.createCrumbedUrl(p.getUrl() + "buildWithParameters").toString()
+                + "&combinations=" + URLEncoder.encode("axis1 != 'value2'", "UTF-8"));
+        WebRequest request = new WebRequest(url, HttpMethod.POST);
+        wc.getPage(request);
 
         j.waitUntilNoActivity();
 
