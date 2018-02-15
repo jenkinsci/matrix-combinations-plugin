@@ -38,6 +38,6 @@ public abstract class MatrixCombinationsShortcutDescriptor
         extends Descriptor<MatrixCombinationsShortcut>
 {
     public static List<MatrixCombinationsShortcutDescriptor> all() {
-        return Jenkins.getInstance().getDescriptorList(MatrixCombinationsShortcut.class);
+        return Jenkins.getActiveInstance().getDescriptorList(MatrixCombinationsShortcut.class);
     }
 }
