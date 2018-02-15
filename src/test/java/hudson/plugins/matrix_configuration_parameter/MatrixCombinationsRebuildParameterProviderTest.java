@@ -28,6 +28,7 @@ import static org.junit.Assert.*;
 
 import java.util.Arrays;
 
+import hudson.markup.RawHtmlMarkupFormatter;
 import hudson.matrix.AxisList;
 import hudson.matrix.Combination;
 import hudson.matrix.MatrixBuild;
@@ -223,6 +224,7 @@ public class MatrixCombinationsRebuildParameterProviderTest
     @Issue("JENKINS-42902")
     @Test
     public void testSafeTitle() throws Exception {
+        j.jenkins.setMarkupFormatter(new RawHtmlMarkupFormatter(true));
         AxisList axes = new AxisList(new TextAxis("axis1", "value1", "value2", "value3"));
         MatrixProject p = j.createMatrixProject();
         p.setAxes(axes);
@@ -244,7 +246,7 @@ public class MatrixCombinationsRebuildParameterProviderTest
     @Issue("JENKINS-42902")
     @Test
     public void testSafeDescription() throws Exception {
-        Assume.assumeNotNull(j.jenkins.getMarkupFormatter());
+        j.jenkins.setMarkupFormatter(new RawHtmlMarkupFormatter(true));
 
         AxisList axes = new AxisList(new TextAxis("axis1", "value1", "value2", "value3"));
         MatrixProject p = j.createMatrixProject();

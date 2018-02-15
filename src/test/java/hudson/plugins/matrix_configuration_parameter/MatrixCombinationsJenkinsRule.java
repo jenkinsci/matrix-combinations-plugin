@@ -24,8 +24,14 @@
 
 package hudson.plugins.matrix_configuration_parameter;
 
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
+import com.gargoylesoftware.htmlunit.html.DomElement;
+import com.gargoylesoftware.htmlunit.html.DomNode;
+import hudson.matrix.MatrixProject;
 import org.apache.commons.httpclient.HttpStatus;
 import org.jvnet.hudson.test.JenkinsRule;
 
@@ -37,6 +43,10 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 import hudson.matrix.AxisList;
 import hudson.matrix.Combination;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import java.io.IOException;
 
 /**
  *
@@ -80,11 +90,11 @@ public class MatrixCombinationsJenkinsRule extends JenkinsRule {
     }
 
     public void checkCombination(HtmlPage page, int index, boolean checked, AxisList axes, String... values) throws Exception {
-        page.<HtmlElement>selectNodes("//*[@class='matrix-combinations-parameter']").get(index)
-            .<HtmlCheckBoxInput>selectNodes(String.format(
-                "//*[@data-combination='%s']//input[@type='checkbox']",
-                new Combination(axes, values).toIndex(axes)
-            )).get(0).setChecked(checked);
+        HtmlElement param = byXPath(page.getDocumentElement(), "//*[@class='matrix-combinations-parameter']", index, HtmlElement.class);
+        HtmlCheckBoxInput checkbox = firstByXPath(param, String.format(
+                ".//*[@data-combination='%s']//input[@type='checkbox']",
+                new Combination(axes, values).toIndex(axes)), HtmlCheckBoxInput.class);
+        checkbox.setChecked(checked);
     }
 
     public void clickShortcut(HtmlPage page, String name) throws Exception {
@@ -92,11 +102,9 @@ public class MatrixCombinationsJenkinsRule extends JenkinsRule {
     }
 
     public void clickShortcut(HtmlPage page, int index, String name) throws Exception {
-        page.<HtmlElement>selectNodes("//*[@class='matrix-combinations-parameter']").get(index)
-            .<HtmlAnchor>selectNodes(String.format(
-                ".//a[@data-shortcut-id='%s']",
-                name
-            )).get(0).click();
+        HtmlElement param = byXPath(page.getDocumentElement(), "//*[@class='matrix-combinations-parameter']", index, HtmlElement.class);
+        HtmlElement shortcut = firstByXPath(param, String.format(".//a[@data-shortcut-id='%s']", name));
+        shortcut.click();
     }
 
     public void assertCombinationChecked(HtmlPage page, boolean checked, AxisList axes, String... values) throws Exception {
@@ -104,13 +112,44 @@ public class MatrixCombinationsJenkinsRule extends JenkinsRule {
     }
 
     public void assertCombinationChecked(HtmlPage page, int index, boolean checked, AxisList axes, String... values) throws Exception {
-        assertEquals(
-            checked,
-            page.<HtmlElement>selectNodes("//*[@class='matrix-combinations-parameter']").get(index)
-                .<HtmlCheckBoxInput>selectNodes(String.format(
-                    ".//*[@data-combination='%s']//input[@type='checkbox']",
-                    new Combination(axes, values).toIndex(axes)
-                )).get(0).isChecked()
-        );
+        HtmlElement param = byXPath(page.getDocumentElement(), "//*[@class='matrix-combinations-parameter']", index, HtmlElement.class);
+        HtmlCheckBoxInput checkbox = firstByXPath(param, String.format(
+                        ".//*[@data-combination='%s']//input[@type='checkbox']",
+                        new Combination(axes, values).toIndex(axes)), HtmlCheckBoxInput.class);
+        assertEquals(checked, checkbox.isChecked());
+    }
+
+    @Nonnull
+    protected static HtmlElement nodeToElement(@CheckForNull DomNode node) {
+        return nodeToElement(node, HtmlElement.class);
+    }
+
+    @Nonnull
+    protected static <T extends Object> T nodeToElement(@CheckForNull Object node, Class<T> c) throws AssertionError {
+        assertNotNull("Node is null", node);
+        assertThat(String.format("Node is not %s: %s", c, node), node, instanceOf(c));
+        return (T)node;
+    }
+
+    @Nonnull
+    protected static HtmlElement firstByXPath(@Nonnull HtmlElement root, String xpath) throws AssertionError {
+        return byXPath(root, xpath, 0, HtmlElement.class);
+    }
+
+    @Nonnull
+    protected static <T extends Object> T firstByXPath(@Nonnull HtmlElement root, String xpath, Class<T> c) throws AssertionError {
+        return byXPath(root, xpath, 0, c);
+    }
+
+    @Nonnull
+    protected static <T extends Object> T byXPath(@Nonnull HtmlElement root, String xpath, int index, Class<T> c) throws AssertionError {
+        Object o = root.getByXPath(xpath).get(index);
+        assertNotNull(String.format("Failed to fetch element #%d for query '%s'. Node: %s", index, xpath, root), o);
+        assertThat(String.format("Node is not %s: %s", c, o), o, instanceOf(c));
+        return (T)o;
+    }
+
+    public MatrixProject createMatrixProject() throws IOException {
+        return createProject(MatrixProject.class);
     }
 }
