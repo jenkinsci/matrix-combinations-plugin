@@ -1,2 +1,3 @@
 // Build the plugin using https://github.com/jenkins-infra/pipeline-library
-buildPlugin(jenkinsVersions: [null, '2.104'])
+// TODO: test version beyond 2.102 (JEP-200)
+buildPlugin(jenkinsVersions: [null])
