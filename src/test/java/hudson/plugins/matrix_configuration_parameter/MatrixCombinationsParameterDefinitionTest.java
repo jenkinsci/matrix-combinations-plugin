@@ -26,11 +26,15 @@ package hudson.plugins.matrix_configuration_parameter;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Arrays;
 
 import com.gargoylesoftware.htmlunit.HttpMethod;
 import com.gargoylesoftware.htmlunit.WebRequest;
+
+import hudson.XmlFile;
 import hudson.cli.CLI;
 import hudson.markup.RawHtmlMarkupFormatter;
 import hudson.matrix.AxisList;
@@ -40,17 +44,19 @@ import hudson.matrix.MatrixProject;
 import hudson.matrix.TextAxis;
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
+import hudson.model.ParametersAction;
 import hudson.model.ParametersDefinitionProperty;
 import hudson.model.queue.QueueTaskFuture;
 import hudson.model.Result;
+import hudson.model.Run;
 
-import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Bug;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
 import org.jvnet.hudson.test.SleepBuilder;
+import org.jvnet.hudson.test.recipes.LocalData;
 
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
@@ -660,4 +666,17 @@ public class MatrixCombinationsParameterDefinitionTest {
         assertNotNull(page.getElementById("test-expected"));
         assertNull(page.getElementById("test-not-expected"));
     }
+
+    @Issue("JENKINS-49573")
+    @LocalData
+    @Test
+    public void compat() throws Exception {
+        MatrixProject p = j.jenkins.getItemByFullName("p", MatrixProject.class);
+        MatrixBuild b = j.assertBuildStatusSuccess(p.scheduleBuild2(0, new ParametersAction(new MatrixCombinationsParameterValue("x", "", Arrays.asList("x=b,y=2")))));
+        b.save();
+        System.out.println(new XmlFile(Run.XSTREAM, new File(b.getRootDir(),"build.xml")).asString());
+        p.save();
+        System.out.println(p.getConfigFile().asString());
+    }
+
 }
