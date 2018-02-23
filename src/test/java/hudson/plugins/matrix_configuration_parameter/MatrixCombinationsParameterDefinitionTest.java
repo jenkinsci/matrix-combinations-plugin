@@ -42,6 +42,7 @@ import hudson.matrix.Combination;
 import hudson.matrix.MatrixBuild;
 import hudson.matrix.MatrixProject;
 import hudson.matrix.TextAxis;
+import hudson.model.Cause;
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.ParametersAction;
@@ -672,9 +673,9 @@ public class MatrixCombinationsParameterDefinitionTest {
     @Test
     public void compat() throws Exception {
         MatrixProject p = j.jenkins.getItemByFullName("p", MatrixProject.class);
-        MatrixBuild b = j.assertBuildStatusSuccess(p.scheduleBuild2(0, new ParametersAction(new MatrixCombinationsParameterValue("x", "", Arrays.asList("x=b,y=2")))));
+        MatrixBuild b = j.assertBuildStatusSuccess(p.scheduleBuild2(0, (Cause) null, new ParametersAction(new MatrixCombinationsParameterValue("x", "", Arrays.asList("x=b,y=2")))));
         b.save();
-        System.out.println(new XmlFile(Run.XSTREAM, new File(b.getRootDir(),"build.xml")).asString());
+        System.out.println(new XmlFile(Run.XSTREAM, new File(b.getRootDir(), "build.xml")).asString());
         p.save();
         System.out.println(p.getConfigFile().asString());
     }
