@@ -47,7 +47,7 @@ public class MatrixCombinationsParameterDefinition extends SimpleParameterDefini
 
     private static final long serialVersionUID = 1L;
     private final String defaultCombinationFilter;
-    @SuppressFBWarnings(value="SE_BAD_FIELD")
+    @SuppressFBWarnings(value="SE_BAD_FIELD", justification="For whatever reason ParameterDefinition is defined as Serializable though only XStream actually serializes it.")
     private final List<MatrixCombinationsShortcut> shortcutList;
 
     /**
@@ -103,6 +103,7 @@ public class MatrixCombinationsParameterDefinition extends SimpleParameterDefini
         this(name, description, null);
     }
 
+    @SuppressFBWarnings(value="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT", justification="This is not normal.")
     private Object readResolve() {
         boolean shortcutListMissing = false;
         if (shortcutList == null) {
