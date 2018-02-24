@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<matrix-project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.plugins.matrix__configuration__parameter.MatrixCombinationsParameterDefinition plugin="matrix-combinations-parameter@1.2.1-SNAPSHOT">
+          <name>x</name>
+          <description></description>
+          <shortcutList class="java.util.Arrays$ArrayList">
+            <a class="hudson.plugins.matrix_configuration_parameter.shortcut.MatrixCombinationsShortcut-array">
+              <hudson.plugins.matrix__configuration__parameter.shortcut.ResultShortcut>
+                <name>Successful</name>
+                <exact>false</exact>
+                <resultsToCheck class="java.util.Collections$UnmodifiableRandomAccessList" resolves-to="java.util.Collections$UnmodifiableList">
+                  <c class="com.google.common.collect.Lists$TransformingRandomAccessList">
+                    <fromList class="java.util.Arrays$ArrayList">
+                      <a class="hudson.model.Result-array">
+                        <hudson.model.Result>
+                          <name>SUCCESS</name>
+                          <ordinal>0</ordinal>
+                          <color>BLUE</color>
+                          <completeBuild>true</completeBuild>
+                        </hudson.model.Result>
+                      </a>
+                    </fromList>
+                    <function class="hudson.plugins.matrix_configuration_parameter.shortcut.ResultShortcut$1"/>
+                  </c>
+                  <list class="com.google.common.collect.Lists$TransformingRandomAccessList" reference="../c"/>
+                </resultsToCheck>
+              </hudson.plugins.matrix__configuration__parameter.shortcut.ResultShortcut>
+              <hudson.plugins.matrix__configuration__parameter.shortcut.ResultShortcut>
+                <name>Failed</name>
+                <exact>false</exact>
+                <resultsToCheck class="java.util.Collections$UnmodifiableRandomAccessList" resolves-to="java.util.Collections$UnmodifiableList">
+                  <c class="com.google.common.collect.Lists$TransformingRandomAccessList">
+                    <fromList class="java.util.Arrays$ArrayList">
+                      <a class="hudson.model.Result-array">
+                        <hudson.model.Result>
+                          <name>FAILURE</name>
+                          <ordinal>2</ordinal>
+                          <color>RED</color>
+                          <completeBuild>true</completeBuild>
+                        </hudson.model.Result>
+                      </a>
+                    </fromList>
+                    <function class="hudson.plugins.matrix_configuration_parameter.shortcut.ResultShortcut$1"/>
+                  </c>
+                  <list class="com.google.common.collect.Lists$TransformingRandomAccessList" reference="../c"/>
+                </resultsToCheck>
+              </hudson.plugins.matrix__configuration__parameter.shortcut.ResultShortcut>
+              <hudson.plugins.matrix__configuration__parameter.shortcut.MatrixCombinationsShortcut_-All/>
+              <hudson.plugins.matrix__configuration__parameter.shortcut.MatrixCombinationsShortcut_-None/>
+            </a>
+          </shortcutList>
+        </hudson.plugins.matrix__configuration__parameter.MatrixCombinationsParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+    <com.sonyericsson.rebuild.RebuildSettings plugin="rebuild@1.21">
+      <autoRebuild>false</autoRebuild>
+    </com.sonyericsson.rebuild.RebuildSettings>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <axes>
+    <hudson.matrix.TextAxis>
+      <name>x</name>
+      <values>
+        <string>a</string>
+        <string>b</string>
+        <string>c</string>
+      </values>
+    </hudson.matrix.TextAxis>
+    <hudson.matrix.TextAxis>
+      <name>y</name>
+      <values>
+        <string>1</string>
+        <string>2</string>
+        <string>3</string>
+      </values>
+    </hudson.matrix.TextAxis>
+  </axes>
+  <builders/>
+  <publishers/>
+  <buildWrappers/>
+  <executionStrategy class="hudson.matrix.DefaultMatrixExecutionStrategyImpl">
+    <runSequentially>false</runSequentially>
+  </executionStrategy>
+</matrix-project>

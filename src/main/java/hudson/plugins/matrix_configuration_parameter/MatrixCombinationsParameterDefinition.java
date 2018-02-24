@@ -104,7 +104,17 @@ public class MatrixCombinationsParameterDefinition extends SimpleParameterDefini
     }
 
     private Object readResolve() {
-        if (this.shortcutList == null) {
+        boolean shortcutListMissing = false;
+        if (shortcutList == null) {
+            shortcutListMissing = true;
+        } else {
+            try { // cf. MatrixCombinationsParameterDefinitionTest#hairyCompat
+                shortcutList.toString();
+            } catch (Exception x) { // e.g., NPE because Arrays.ArrayList.a == null
+                shortcutListMissing = true;
+            }
+        }
+        if (shortcutListMissing) {
             // the one from < 1.1.0
             return new MatrixCombinationsParameterDefinition(getName(), getDescription(), getDefaultCombinationFilter());
         }
