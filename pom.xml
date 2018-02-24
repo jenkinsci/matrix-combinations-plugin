@@ -44,7 +44,8 @@
       <dependency>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>matrix-project</artifactId>
-        <version>1.4.1</version>
+        <!-- The version with fix for SECUTIRY-170 to test with newer cores. -->
+        <version>1.7</version>
       </dependency>
       <dependency>
         <groupId>com.sonyericsson.hudson.plugins.rebuild</groupId>
@@ -56,13 +57,6 @@
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>antisamy-markup-formatter</artifactId>
         <version>1.5</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <!-- Required by matrix-project -->
-        <groupId>org.jenkins-ci.plugins</groupId>
-        <artifactId>junit</artifactId>
-        <version>1.2-beta-4</version>
         <scope>test</scope>
       </dependency>
     </dependencies>
