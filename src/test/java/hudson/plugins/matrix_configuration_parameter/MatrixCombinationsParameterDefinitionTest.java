@@ -26,30 +26,47 @@ package hudson.plugins.matrix_configuration_parameter;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
+import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Arrays;
+import java.util.Map;
 
+import com.gargoylesoftware.htmlunit.HttpMethod;
+import com.gargoylesoftware.htmlunit.WebRequest;
+
+import hudson.XmlFile;
 import hudson.cli.CLI;
+import hudson.diagnosis.OldDataMonitor;
+import hudson.markup.RawHtmlMarkupFormatter;
 import hudson.matrix.AxisList;
 import hudson.matrix.Combination;
 import hudson.matrix.MatrixBuild;
 import hudson.matrix.MatrixProject;
 import hudson.matrix.TextAxis;
+import hudson.model.AdministrativeMonitor;
+import hudson.model.Cause;
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
+import hudson.model.ParametersAction;
 import hudson.model.ParametersDefinitionProperty;
 import hudson.model.queue.QueueTaskFuture;
 import hudson.model.Result;
+import hudson.model.Run;
+import hudson.model.Saveable;
 
-import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Bug;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
 import org.jvnet.hudson.test.SleepBuilder;
+import org.jvnet.hudson.test.recipes.LocalData;
 
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+
+import hudson.plugins.matrix_configuration_parameter.shortcut.MatrixCombinationsShortcut;
 
 /**
  *
@@ -574,12 +591,8 @@ public class MatrixCombinationsParameterDefinitionTest {
 
         CLI cli = new CLI(j.getURL());
         int ret = cli.execute(
-            "build",
-            p.getFullName(),
-            "-p",
-            // You can't use axis1 != 'value2'
-            // for JENKINS-21160 (fixed in Jenkins 1.606)
-            "combinations=axis1 in ['value1', 'value3']"
+            "build", p.getFullName(),
+            "-p", "combinations=axis1 != 'value2'"
         );
         assertEquals(0, ret);
 
@@ -603,10 +616,10 @@ public class MatrixCombinationsParameterDefinitionTest {
         ));
 
         WebClient wc = j.createWebClient();
-        wc.getPage(p, String.format(
-            "/buildWithParameters?combinations=%s",
-            URLEncoder.encode("axis1 in ['value1', 'value3']", "UTF-8")
-        ));
+        URL url = new URL(wc.createCrumbedUrl(p.getUrl() + "buildWithParameters").toString()
+                + "&combinations=" + URLEncoder.encode("axis1 != 'value2'", "UTF-8"));
+        WebRequest request = new WebRequest(url, HttpMethod.POST);
+        wc.getPage(request);
 
         j.waitUntilNoActivity();
 
@@ -621,6 +634,7 @@ public class MatrixCombinationsParameterDefinitionTest {
     @Issue("JENKINS-42902")
     @Test
     public void testSafeTitle() throws Exception {
+        j.jenkins.setMarkupFormatter(new RawHtmlMarkupFormatter(true));
         AxisList axes = new AxisList(new TextAxis("axis1", "value1", "value2", "value3"));
         MatrixProject p = j.createMatrixProject();
         p.setAxes(axes);
@@ -640,7 +654,7 @@ public class MatrixCombinationsParameterDefinitionTest {
     @Issue("JENKINS-42902")
     @Test
     public void testSafeDescription() throws Exception {
-        Assume.assumeNotNull(j.jenkins.getMarkupFormatter());
+        j.jenkins.setMarkupFormatter(new RawHtmlMarkupFormatter(true));
 
         AxisList axes = new AxisList(new TextAxis("axis1", "value1", "value2", "value3"));
         MatrixProject p = j.createMatrixProject();
@@ -659,4 +673,38 @@ public class MatrixCombinationsParameterDefinitionTest {
         assertNotNull(page.getElementById("test-expected"));
         assertNull(page.getElementById("test-not-expected"));
     }
+
+    /** Upgrade from settings stored prior to 1.1.0. */
+    @Issue("JENKINS-49573")
+    @LocalData
+    @Test
+    public void compat() throws Exception {
+        MatrixProject p = j.jenkins.getItemByFullName("p", MatrixProject.class);
+        MatrixBuild b = j.assertBuildStatusSuccess(p.scheduleBuild2(0, (Cause) null, new ParametersAction(new MatrixCombinationsParameterValue("x", "", Arrays.asList("x=b,y=2")))));
+        b.save();
+        System.out.println(new XmlFile(Run.XSTREAM, new File(b.getRootDir(), "build.xml")).asString());
+        p.save();
+        System.out.println(p.getConfigFile().asString());
+    }
+
+    /** Settings stored prior to 1.1.0 but job then disabled and reënabled <em>without</em> resaving the configuration form. */
+    @Issue("JENKINS-49573")
+    @LocalData
+    @Test
+    public void hairyCompat() throws Exception {
+        for (Map.Entry<Saveable, OldDataMonitor.VersionRange> entry : AdministrativeMonitor.all().get(OldDataMonitor.class).getData().entrySet()) {
+            // as of JEP-200 will show errors from com.google.common.collect.Lists$TransformingRandomAccessList
+            System.out.println(entry.getKey() + " → " + entry.getValue().extra);
+        }
+        MatrixProject p = j.jenkins.getItemByFullName("p", MatrixProject.class);
+        MatrixBuild b = j.assertBuildStatusSuccess(p.scheduleBuild2(0, (Cause) null, new ParametersAction(new MatrixCombinationsParameterValue("x", "", Arrays.asList("x=b,y=2")))));
+        for (MatrixCombinationsShortcut shortcut : ((MatrixCombinationsParameterDefinition) p.getProperty(ParametersDefinitionProperty.class).getParameterDefinition("x")).getShortcutList()) {
+            System.out.println(shortcut.getCombinationsData(p, b));
+        }
+        b.save();
+        System.out.println(new XmlFile(Run.XSTREAM, new File(b.getRootDir(), "build.xml")).asString());
+        p.save();
+        System.out.println(p.getConfigFile().asString());
+    }
+
 }

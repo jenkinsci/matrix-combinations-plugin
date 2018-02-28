@@ -203,7 +203,7 @@ public class MatrixCombinationsParameterValue extends ParameterValue {
      */
     public String getFormattedDescription() {
         try {
-            return Jenkins.getInstance().getMarkupFormatter().translate(getDescription());
+            return Jenkins.getActiveInstance().getMarkupFormatter().translate(getDescription());
         } catch (IOException e) {
             LOGGER.log(
                 Level.WARNING,

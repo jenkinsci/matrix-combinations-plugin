@@ -46,6 +46,7 @@ import hudson.matrix.MatrixBuild;
 import hudson.matrix.MatrixProject;
 import hudson.matrix.MatrixRun;
 import hudson.model.Result;
+import java.util.ArrayList;
 
 /**
  * Shortcut to select combinations based on build results
@@ -69,7 +70,7 @@ public class ResultShortcut extends MatrixCombinationsShortcut {
         this.name = Util.fixNull(name);
         this.exact = exact;
         this.resultsToCheck = (resultsToCheck != null)
-            ? Collections.unmodifiableList(resultsToCheck)
+            ? new ArrayList<>(resultsToCheck)
             : Collections.<String>emptyList();
     }
 
