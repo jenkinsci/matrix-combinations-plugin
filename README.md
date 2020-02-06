@@ -2,7 +2,9 @@
 
 This plugin allows a user to choose which matrix combinations he wants to run, as opposed to the default behaviour where jenkins runs all combinations and translate it into a groovy condition such as:
 
-axis1=="axis1value1" && axis2=="axis2value1" || axis1=="axis1value2" && axis2=="axis2value2" || ...:
+```groovy
+axis1=="axis1value1" && axis2=="axis2value1" || axis1=="axis1value2" && axis2=="axis2value2" || ...
+```
 
 ## Configuration
 
