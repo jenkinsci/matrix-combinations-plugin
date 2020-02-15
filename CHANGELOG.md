@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 1.3.1 (15 Feb 2020)
+
+-   Move wiki-documentation to Github ([Pull request #26](https://github.com/jenkinsci/matrix-combinations-plugin/pull/26))
+
 ## Version 1.3.0 (3 Mar 2018)
 
 -   Now targets Jenkins \>= 1.651.3
