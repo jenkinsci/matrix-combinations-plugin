@@ -58,7 +58,7 @@ private void drawTableBall(Combination combination,AxisList axes,MatrixCombinati
     result = matrixValue.combinationExists(axes, combination);
     if (run != null && result){
         a(href:rootURL+"/"+run.getUrl()){
-            img(src: "${imagesURL}/24x24/"+run.getBuildStatusUrl());
+            l.icon(class:"icon-md "+run.getIconColor().getIconClassName())
             if (!layouter.x || !layouter.y) {
                 text(combination.toString(layouter.z))
               }
@@ -68,7 +68,7 @@ private void drawTableBall(Combination combination,AxisList axes,MatrixCombinati
         }
 
     } else {
-        img(src: "${imagesURL}/24x24/grey.gif");
+        l.icon(class:"icon-md icon-nobuilt")
         if (!layouter.x || !layouter.y) {
             text(combination.toString(layouter.z))
           }
