@@ -71,7 +71,6 @@ private void drawTableBall(Combination combination,AxisList axes,matrixValue,Mat
     if (run != null && result){
         a(href:rootURL+"/"+run.getUrl()){
             l.icon(class:"icon-md "+run.getIconColor().getIconClassName())
-            img(src: "${imagesURL}/24x24/"+run.getBuildStatusUrl());
             if (!layouter.x || !layouter.y) {
               text(combination.toString(layouter.z))
             }
