@@ -66,7 +66,7 @@ private void drawMainBall(MatrixCombinationsParameterDefinition paramDef, Combin
         lastRun = lastBuild.getRun(combination);
         if (lastRun != null){
             a(href:rootURL+"/"+lastRun.getUrl()){
-            img(src: "${imagesURL}/24x24/"+lastRun.getBuildStatusUrl())
+            l.icon(class:"icon-md "+lastRun.getIconColor().getIconClassName())
             if (!layouter.x || !layouter.y) {
               text(combination.toString(layouter.z))
             }
@@ -78,7 +78,7 @@ private void drawMainBall(MatrixCombinationsParameterDefinition paramDef, Combin
         }
 
     } else{
-        img(src: "${imagesURL}/24x24/grey.gif")
+        l.icon(class:"icon-md icon-nobuilt")
         if (!layouter.x || !layouter.y) {
           text(combination.toString(layouter.z))
         }
