@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 1.3.2 (29 Oct 2022)
+
+-   FIXED: grey ball images are broken since Jenkins-2.333 ([JENKINS-69777](https://issues.jenkins.io/browse/JENKINS-69777))
+
 ## Version 1.3.1 (15 Feb 2020)
 
 -   Move wiki-documentation to Github ([Pull request #26](https://github.com/jenkinsci/matrix-combinations-plugin/pull/26))
