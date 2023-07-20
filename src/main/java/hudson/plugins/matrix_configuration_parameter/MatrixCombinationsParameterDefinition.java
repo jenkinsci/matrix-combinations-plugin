@@ -109,7 +109,7 @@ public class MatrixCombinationsParameterDefinition extends SimpleParameterDefini
         if (shortcutList == null) {
             shortcutListMissing = true;
         } else {
-            try { // cf. MatrixCombinationsParameterDefinitionTest#hairyCompat
+            try {
                 shortcutList.toString();
             } catch (Exception x) { // e.g., NPE because Arrays.ArrayList.a == null
                 shortcutListMissing = true;

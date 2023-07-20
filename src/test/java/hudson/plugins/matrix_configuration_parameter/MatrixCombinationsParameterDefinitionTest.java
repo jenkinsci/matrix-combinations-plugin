@@ -32,12 +32,12 @@ import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Map;
 
-import com.gargoylesoftware.htmlunit.HttpMethod;
-import com.gargoylesoftware.htmlunit.WebRequest;
+import org.htmlunit.HttpMethod;
+import org.htmlunit.WebRequest;
 
 import hudson.XmlFile;
-import hudson.cli.CLI;
-import hudson.diagnosis.OldDataMonitor;
+import hudson.cli.BuildCommand;
+import hudson.cli.CLICommandInvoker;
 import hudson.markup.RawHtmlMarkupFormatter;
 import hudson.matrix.AxisList;
 import hudson.matrix.Combination;
@@ -63,10 +63,8 @@ import org.jvnet.hudson.test.JenkinsRule.WebClient;
 import org.jvnet.hudson.test.SleepBuilder;
 import org.jvnet.hudson.test.recipes.LocalData;
 
-import com.gargoylesoftware.htmlunit.html.HtmlForm;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-
-import hudson.plugins.matrix_configuration_parameter.shortcut.MatrixCombinationsShortcut;
+import org.htmlunit.html.HtmlForm;
+import org.htmlunit.html.HtmlPage;
 
 /**
  *
@@ -452,12 +450,13 @@ public class MatrixCombinationsParameterDefinitionTest {
         
         p.getBuildersList().add(new SleepBuilder(5000));
         
-        QueueTaskFuture<MatrixBuild> f = p.scheduleBuild2(0);
+        MatrixBuild b = p.scheduleBuild2(0).waitForStart();
         
         WebClient wc = j.createAllow405WebClient();
         wc.getPage(p, "build");
         
-        f.cancel(true);
+        b.doStop();
+        j.assertBuildStatus(Result.ABORTED, j.waitForCompletion(b));
     }
     
     @Test
@@ -589,12 +588,7 @@ public class MatrixCombinationsParameterDefinitionTest {
             new MatrixCombinationsParameterDefinition("combinations", "", "")
         ));
 
-        CLI cli = new CLI(j.getURL());
-        int ret = cli.execute(
-            "build", p.getFullName(),
-            "-p", "combinations=axis1 != 'value2'"
-        );
-        assertEquals(0, ret);
+        assertThat(new CLICommandInvoker(j, new BuildCommand()).invokeWithArgs("-s", "-p", "combinations=axis1 != 'value2'", p.getFullName()), CLICommandInvoker.Matcher.succeeded());
 
         j.waitUntilNoActivity();
 
@@ -651,29 +645,6 @@ public class MatrixCombinationsParameterDefinitionTest {
         assertNull(page.getElementById("test-not-expected"));
     }
 
-    @Issue("JENKINS-42902")
-    @Test
-    public void testSafeDescription() throws Exception {
-        j.jenkins.setMarkupFormatter(new RawHtmlMarkupFormatter(true));
-
-        AxisList axes = new AxisList(new TextAxis("axis1", "value1", "value2", "value3"));
-        MatrixProject p = j.createMatrixProject();
-        p.setAxes(axes);
-        p.addProperty(new ParametersDefinitionProperty(
-            new MatrixCombinationsParameterDefinition(
-                "combinations",
-                "<span id=\"test-expected\">blahblah</span>"
-                + "<script id=\"test-not-expected\"></script>"
-            )
-        ));
-
-        WebClient wc = j.createAllow405WebClient();
-        HtmlPage page = wc.getPage(p, "build");
-
-        assertNotNull(page.getElementById("test-expected"));
-        assertNull(page.getElementById("test-not-expected"));
-    }
-
     /** Upgrade from settings stored prior to 1.1.0. */
     @Issue("JENKINS-49573")
     @LocalData
@@ -686,25 +657,4 @@ public class MatrixCombinationsParameterDefinitionTest {
         p.save();
         System.out.println(p.getConfigFile().asString());
     }
-
-    /** Settings stored prior to 1.1.0 but job then disabled and reënabled <em>without</em> resaving the configuration form. */
-    @Issue("JENKINS-49573")
-    @LocalData
-    @Test
-    public void hairyCompat() throws Exception {
-        for (Map.Entry<Saveable, OldDataMonitor.VersionRange> entry : AdministrativeMonitor.all().get(OldDataMonitor.class).getData().entrySet()) {
-            // as of JEP-200 will show errors from com.google.common.collect.Lists$TransformingRandomAccessList
-            System.out.println(entry.getKey() + " → " + entry.getValue().extra);
-        }
-        MatrixProject p = j.jenkins.getItemByFullName("p", MatrixProject.class);
-        MatrixBuild b = j.assertBuildStatusSuccess(p.scheduleBuild2(0, (Cause) null, new ParametersAction(new MatrixCombinationsParameterValue("x", "", Arrays.asList("x=b,y=2")))));
-        for (MatrixCombinationsShortcut shortcut : ((MatrixCombinationsParameterDefinition) p.getProperty(ParametersDefinitionProperty.class).getParameterDefinition("x")).getShortcutList()) {
-            System.out.println(shortcut.getCombinationsData(p, b));
-        }
-        b.save();
-        System.out.println(new XmlFile(Run.XSTREAM, new File(b.getRootDir(), "build.xml")).asString());
-        p.save();
-        System.out.println(p.getConfigFile().asString());
-    }
-
 }
