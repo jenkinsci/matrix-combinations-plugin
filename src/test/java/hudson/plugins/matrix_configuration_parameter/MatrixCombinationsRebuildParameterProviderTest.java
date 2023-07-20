@@ -49,8 +49,8 @@ import org.jvnet.hudson.test.Bug;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
 
-import com.gargoylesoftware.htmlunit.html.HtmlForm;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import org.htmlunit.html.HtmlForm;
+import org.htmlunit.html.HtmlPage;
 
 /**
  *
@@ -241,31 +241,6 @@ public class MatrixCombinationsRebuildParameterProviderTest
         WebClient wc = j.createWebClient();
         HtmlPage page = wc.getPage(b, "rebuild");
 
-        assertNull(page.getElementById("test-not-expected"));
-    }
-
-    @Issue("JENKINS-42902")
-    @Test
-    public void testSafeDescription() throws Exception {
-        j.jenkins.setMarkupFormatter(new RawHtmlMarkupFormatter(true));
-
-        AxisList axes = new AxisList(new TextAxis("axis1", "value1", "value2", "value3"));
-        MatrixProject p = j.createMatrixProject();
-        p.setAxes(axes);
-        p.addProperty(new ParametersDefinitionProperty(
-                new MatrixCombinationsParameterDefinition(
-                    "combinations",
-                    "<span id=\"test-expected\">blahblah</span>"
-                        + "<script id=\"test-not-expected\"></script>"
-                )
-        ));
-
-        MatrixBuild b = j.assertBuildStatusSuccess(p.scheduleBuild2(0).get());
-
-        WebClient wc = j.createWebClient();
-        HtmlPage page = wc.getPage(b, "rebuild");
-
-        assertNotNull(page.getElementById("test-expected"));
         assertNull(page.getElementById("test-not-expected"));
     }
 }

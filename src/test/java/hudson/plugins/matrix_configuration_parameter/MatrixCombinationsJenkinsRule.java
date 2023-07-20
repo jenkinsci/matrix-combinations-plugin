@@ -29,17 +29,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
-import com.gargoylesoftware.htmlunit.html.DomElement;
-import com.gargoylesoftware.htmlunit.html.DomNode;
+import org.htmlunit.html.DomElement;
+import org.htmlunit.html.DomNode;
 import hudson.matrix.MatrixProject;
-import org.apache.commons.httpclient.HttpStatus;
 import org.jvnet.hudson.test.JenkinsRule;
 
-import com.gargoylesoftware.htmlunit.WebResponse;
-import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
-import com.gargoylesoftware.htmlunit.html.HtmlCheckBoxInput;
-import com.gargoylesoftware.htmlunit.html.HtmlElement;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import org.htmlunit.WebResponse;
+import org.htmlunit.html.HtmlAnchor;
+import org.htmlunit.html.HtmlCheckBoxInput;
+import org.htmlunit.html.HtmlElement;
+import org.htmlunit.html.HtmlPage;
 
 import hudson.matrix.AxisList;
 import hudson.matrix.Combination;
@@ -59,14 +58,14 @@ public class MatrixCombinationsJenkinsRule extends JenkinsRule {
      * @return WebClient
      */
     public WebClient createAllow405WebClient() {
-        return new WebClient() {
+        WebClient webClient = new WebClient() {
             private static final long serialVersionUID = 2209855651713458482L;
             
             @Override
             public void throwFailingHttpStatusCodeExceptionIfNecessary(
                     WebResponse webResponse
             ) {
-                if(webResponse.getStatusCode() == HttpStatus.SC_METHOD_NOT_ALLOWED) {
+                if(webResponse.getStatusCode() == 405) {
                     // allow 405.
                     return;
                 }
@@ -75,7 +74,7 @@ public class MatrixCombinationsJenkinsRule extends JenkinsRule {
             
             @Override
             public void printContentIfNecessary(WebResponse webResponse) {
-                if(webResponse.getStatusCode() == HttpStatus.SC_METHOD_NOT_ALLOWED)
+                if(webResponse.getStatusCode() == 405)
                 {
                     // allow 405.
                     return;
@@ -83,6 +82,8 @@ public class MatrixCombinationsJenkinsRule extends JenkinsRule {
                 super.printContentIfNecessary(webResponse);
             }
         };
+        webClient.getOptions().setFetchPolyfillEnabled(true);
+        return webClient;
     }
 
     public void checkCombination(HtmlPage page, boolean checked, AxisList axes, String... values) throws Exception {
@@ -112,7 +113,12 @@ public class MatrixCombinationsJenkinsRule extends JenkinsRule {
     }
 
     public void assertCombinationChecked(HtmlPage page, int index, boolean checked, AxisList axes, String... values) throws Exception {
-        HtmlElement param = byXPath(page.getDocumentElement(), "//*[@class='matrix-combinations-parameter']", index, HtmlElement.class);
+        HtmlElement param;
+        if (index == 0) {
+            param = page.getDocumentElement();
+        } else {
+            param = byXPath(page.getDocumentElement(), "//*[@class='matrix-combinations-parameter']", index, HtmlElement.class);
+        }
         HtmlCheckBoxInput checkbox = firstByXPath(param, String.format(
                         ".//*[@data-combination='%s']//input[@type='checkbox']",
                         new Combination(axes, values).toIndex(axes)), HtmlCheckBoxInput.class);
