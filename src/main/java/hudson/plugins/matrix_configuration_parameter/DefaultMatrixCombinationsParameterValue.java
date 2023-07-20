@@ -1,18 +1,18 @@
 /*
  * The MIT License
- * 
+ *
  * Copyright (c) 2014 IKEDA Yasuyuki
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -32,19 +32,18 @@ import hudson.util.VariableResolver;
 /**
  * {@link MatrixCombinationsParameterValue} created when the build started
  * without specifying parameter.
- * 
+ *
  * {@link MatrixCombinationsParameterValue#getCombinations()}
  * does not work (always return an empty list).
  */
 public class DefaultMatrixCombinationsParameterValue extends MatrixCombinationsParameterValue {
     private static final long serialVersionUID = -812826069693143705L;
     private final String combinationFilter;
-    
+
     public DefaultMatrixCombinationsParameterValue(String name, String description, String combinationFilter) {
         super(name, description, null);
         this.combinationFilter = combinationFilter;
     }
-    
 
     /**
      * @return combination filter
@@ -57,15 +56,16 @@ public class DefaultMatrixCombinationsParameterValue extends MatrixCombinationsP
     @Override
     public VariableResolver<String> createVariableResolver(AbstractBuild<?, ?> build) {
         return new VariableResolver<String>() {
+            @Override
             public String resolve(String name) {
                 if (!DefaultMatrixCombinationsParameterValue.this.name.equals(name)) {
                     return null;
                 }
-                return (combinationFilter != null)?combinationFilter:"";
+                return (combinationFilter != null) ? combinationFilter : "";
             }
         };
     }
-    
+
     /**
      * @param axes
      * @param c
@@ -73,7 +73,7 @@ public class DefaultMatrixCombinationsParameterValue extends MatrixCombinationsP
      * @see hudson.plugins.matrix_configuration_parameter.MatrixCombinationsParameterValue#combinationExists(hudson.matrix.AxisList, hudson.matrix.Combination)
      */
     @Override
-    public boolean combinationExists(AxisList axes, Combination c){
+    public boolean combinationExists(AxisList axes, Combination c) {
         if (axes == null || combinationFilter == null) {
             // when axes is null, the combination filter cannot be evaluated
             // when combination filter is null, allow all combination.
@@ -93,23 +93,22 @@ public class DefaultMatrixCombinationsParameterValue extends MatrixCombinationsP
         if (!(getClass().equals(obj.getClass()))) {
             return false;
         }
-        DefaultMatrixCombinationsParameterValue other = (DefaultMatrixCombinationsParameterValue)obj;
-        
+        DefaultMatrixCombinationsParameterValue other = (DefaultMatrixCombinationsParameterValue) obj;
+
         if (combinationFilter == null) {
             return other.combinationFilter == null;
         }
-        
+
         return combinationFilter.equals(other.combinationFilter);
     }
-    
+
     @Override
     public int hashCode() {
         return (combinationFilter != null) ? combinationFilter.hashCode() : 0;
     }
-    
+
     @Override
     public String toString() {
-        return String.format("(%s) %s: %s", 
-                getClass().getName(), getName(), combinationFilter);
+        return String.format("(%s) %s: %s", getClass().getName(), getName(), combinationFilter);
     }
 }

@@ -24,51 +24,41 @@
 
 package hudson.plugins.matrix_configuration_parameter.shortcut;
 
-import java.util.Collection;
-import java.util.Collections;
-
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-
-import org.kohsuke.stapler.DataBoundConstructor;
-
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-
 import hudson.Extension;
 import hudson.matrix.Combination;
 import hudson.matrix.MatrixBuild;
 import hudson.matrix.MatrixProject;
 import hudson.matrix.MatrixRun;
+import java.util.Collection;
+import java.util.Collections;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
  * Shortcut to check combinations used in the previous build
  */
 public class PreviousShortcut extends MatrixCombinationsShortcut {
     @DataBoundConstructor
-    public PreviousShortcut() {
-    }
+    public PreviousShortcut() {}
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
     @Override
-    public Collection<Combination> getCombinations(
-        @Nonnull MatrixProject project,
-        @CheckForNull MatrixBuild build
-    ) {
+    public Collection<Combination> getCombinations(@Nonnull MatrixProject project, @CheckForNull MatrixBuild build) {
         if (build == null) {
             return Collections.emptyList();
         }
-        return Lists.transform(
-            build.getExactRuns(),
-            new Function<MatrixRun, Combination>() {
-                public Combination apply(MatrixRun r) {
-                    return r.getParent().getCombination();
-                }
+        return Lists.transform(build.getExactRuns(), new Function<MatrixRun, Combination>() {
+            @Override
+            public Combination apply(MatrixRun r) {
+                return r.getParent().getCombination();
             }
-        );
+        });
     }
 
     /**

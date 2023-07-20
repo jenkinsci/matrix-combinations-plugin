@@ -24,18 +24,8 @@
 
 package hudson.plugins.matrix_configuration_parameter.shortcut;
 
-import java.util.Collection;
-import java.util.Collections;
-
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-
-import org.apache.commons.lang.StringUtils;
-import org.kohsuke.stapler.DataBoundConstructor;
-
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
-
 import hudson.Extension;
 import hudson.ExtensionPoint;
 import hudson.matrix.Combination;
@@ -43,15 +33,20 @@ import hudson.matrix.MatrixBuild;
 import hudson.matrix.MatrixConfiguration;
 import hudson.matrix.MatrixProject;
 import hudson.model.AbstractDescribableImpl;
+import java.util.Collection;
+import java.util.Collections;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import org.apache.commons.lang.StringUtils;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
  * Defines shortcut link to select a set of axes combinations.
  *
  * @since 1.1.0
  */
-public abstract class MatrixCombinationsShortcut
-        extends AbstractDescribableImpl<MatrixCombinationsShortcut> implements ExtensionPoint
-{
+public abstract class MatrixCombinationsShortcut extends AbstractDescribableImpl<MatrixCombinationsShortcut>
+        implements ExtensionPoint {
     /**
      * Return combinations to check for the build
      *
@@ -63,9 +58,7 @@ public abstract class MatrixCombinationsShortcut
      */
     @Nonnull
     public abstract Collection<Combination> getCombinations(
-        @Nonnull MatrixProject project,
-        @CheckForNull MatrixBuild build
-    );
+            @Nonnull MatrixProject project, @CheckForNull MatrixBuild build);
 
     /**
      * Return a value used for javascript.
@@ -75,18 +68,15 @@ public abstract class MatrixCombinationsShortcut
      * @return comma-separated list of combination indices
      */
     @Nonnull
-    public final String getCombinationsData(
-        @Nonnull final MatrixProject project,
-        @CheckForNull MatrixBuild build
-    ) {
-        return StringUtils.join(Collections2.transform(
-            getCombinations(project, build),
-            new Function<Combination, String>() {
-                public String apply(Combination c) {
-                    return Integer.toString(c.toIndex(project.getAxes()));
-                }
-            }
-        ), ',');
+    public final String getCombinationsData(@Nonnull final MatrixProject project, @CheckForNull MatrixBuild build) {
+        return StringUtils.join(
+                Collections2.transform(getCombinations(project, build), new Function<Combination, String>() {
+                    @Override
+                    public String apply(Combination c) {
+                        return Integer.toString(c.toIndex(project.getAxes()));
+                    }
+                }),
+                ',');
     }
 
     /**
@@ -106,7 +96,7 @@ public abstract class MatrixCombinationsShortcut
      */
     @Override
     public MatrixCombinationsShortcutDescriptor getDescriptor() {
-        return (MatrixCombinationsShortcutDescriptor)super.getDescriptor();
+        return (MatrixCombinationsShortcutDescriptor) super.getDescriptor();
     }
 
     /**
@@ -117,8 +107,7 @@ public abstract class MatrixCombinationsShortcut
          * ctor
          */
         @DataBoundConstructor
-        public All() {
-        }
+        public All() {}
 
         /**
          * {@inheritDoc}
@@ -126,17 +115,14 @@ public abstract class MatrixCombinationsShortcut
         @Nonnull
         @Override
         public Collection<Combination> getCombinations(
-            @Nonnull MatrixProject project,
-            @CheckForNull MatrixBuild build
-        ) {
+                @Nonnull MatrixProject project, @CheckForNull MatrixBuild build) {
             return Collections2.transform(
-                project.getActiveConfigurations(),
-                new Function<MatrixConfiguration, Combination>() {
-                    public Combination apply(MatrixConfiguration c) {
-                        return c.getCombination();
-                    }
-                }
-            );
+                    project.getActiveConfigurations(), new Function<MatrixConfiguration, Combination>() {
+                        @Override
+                        public Combination apply(MatrixConfiguration c) {
+                            return c.getCombination();
+                        }
+                    });
         }
 
         /**
@@ -160,7 +146,7 @@ public abstract class MatrixCombinationsShortcut
         /**
          * Descriptor for {@link All}
          */
-        @Extension(ordinal=120) // Top most
+        @Extension(ordinal = 120) // Top most
         public static class DescriptorImpl extends MatrixCombinationsShortcutDescriptor {
             /**
              * {@inheritDoc}
@@ -180,8 +166,7 @@ public abstract class MatrixCombinationsShortcut
          * ctor
          */
         @DataBoundConstructor
-        public None() {
-        }
+        public None() {}
 
         /**
          * {@inheritDoc}
@@ -189,9 +174,7 @@ public abstract class MatrixCombinationsShortcut
         @Nonnull
         @Override
         public Collection<Combination> getCombinations(
-            @Nonnull MatrixProject project,
-            @CheckForNull MatrixBuild build
-        ) {
+                @Nonnull MatrixProject project, @CheckForNull MatrixBuild build) {
             return Collections.emptyList();
         }
 
@@ -216,7 +199,7 @@ public abstract class MatrixCombinationsShortcut
         /**
          * Descriptor for {@link None}
          */
-        @Extension(ordinal=110) // Next to All
+        @Extension(ordinal = 110) // Next to All
         public static class DescriptorImpl extends MatrixCombinationsShortcutDescriptor {
             /**
              * {@inheritDoc}

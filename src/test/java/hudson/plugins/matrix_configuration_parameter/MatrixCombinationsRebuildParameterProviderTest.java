@@ -1,18 +1,18 @@
 /*
  * The MIT License
- * 
+ *
  * Copyright (c) 2014 IKEDA Yasuyuki
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,9 +24,9 @@
 
 package hudson.plugins.matrix_configuration_parameter;
 
-import static org.junit.Assert.*;
-
-import java.util.Arrays;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import hudson.markup.RawHtmlMarkupFormatter;
 import hudson.matrix.AxisList;
@@ -41,7 +41,9 @@ import hudson.model.ParametersAction;
 import hudson.model.ParametersDefinitionProperty;
 import hudson.model.Result;
 import hudson.model.StringParameterValue;
-
+import java.util.Arrays;
+import org.htmlunit.html.HtmlForm;
+import org.htmlunit.html.HtmlPage;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -49,99 +51,91 @@ import org.jvnet.hudson.test.Bug;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
 
-import org.htmlunit.html.HtmlForm;
-import org.htmlunit.html.HtmlPage;
-
 /**
  *
  */
-public class MatrixCombinationsRebuildParameterProviderTest
-{
+public class MatrixCombinationsRebuildParameterProviderTest {
     @Rule
     public MatrixCombinationsJenkinsRule j = new MatrixCombinationsJenkinsRule();
-    
+
     @Test
     public void testRebuildOneAxis() throws Exception {
         MatrixProject p = j.createMatrixProject();
         p.setAxes(new AxisList(new TextAxis("axis1", "value1", "value2", "value3")));
         p.addProperty(new ParametersDefinitionProperty(new MatrixCombinationsParameterDefinition("combinations", "")));
-        
+
         // first run.
         // asserts that only combinations specified with MatrixCombinationsParameterValue are built.
         @SuppressWarnings("deprecation")
         Cause cause = new Cause.UserCause();
-        MatrixBuild b1 = p.scheduleBuild2(0, cause, Arrays.asList(
-                new ParametersAction(new MatrixCombinationsParameterValue(
-                        "combinations",
-                        new Boolean[]{ true, false, true },
-                        new String[]{ "axis1=value1", "axis1=value2", "axis1=value3" }
-                ))
-        )).get();
+        MatrixBuild b1 = p.scheduleBuild2(
+                        0,
+                        cause,
+                        Arrays.asList(new ParametersAction(new MatrixCombinationsParameterValue(
+                                "combinations",
+                                new Boolean[] {true, false, true},
+                                new String[] {"axis1=value1", "axis1=value2", "axis1=value3"}))))
+                .get();
         j.assertBuildStatusSuccess(b1);
         assertNotNull(b1.getExactRun(new Combination(p.getAxes(), "value1")));
         assertNull(b1.getExactRun(new Combination(p.getAxes(), "value2")));
         assertNotNull(b1.getExactRun(new Combination(p.getAxes(), "value3")));
-        
-        
+
         // second run (rebuild)
         // asserts that only combinations in the first run are built.
         WebClient wc = j.createWebClient();
         HtmlPage page = wc.getPage(b1, "rebuild");
         HtmlForm form = page.getFormByName("config");
         j.submit(form);
-        
+
         j.waitUntilNoActivity();
-        
-        MatrixBuild b2  = p.getLastBuild();
+
+        MatrixBuild b2 = p.getLastBuild();
         assertNotEquals(b1.getNumber(), b2.getNumber());
         j.assertBuildStatusSuccess(b2);
         assertNotNull(b2.getExactRun(new Combination(p.getAxes(), "value1")));
         assertNull(b2.getExactRun(new Combination(p.getAxes(), "value2")));
         assertNotNull(b2.getExactRun(new Combination(p.getAxes(), "value3")));
     }
-    
+
     @Test
     public void testRebuildTwoAxes() throws Exception {
         MatrixProject p = j.createMatrixProject();
         p.setAxes(new AxisList(
-                new TextAxis("axis1", "value1-1", "value1-2"),
-                new TextAxis("axis2", "value2-1", "value2-2")
-        ));
+                new TextAxis("axis1", "value1-1", "value1-2"), new TextAxis("axis2", "value2-1", "value2-2")));
         p.addProperty(new ParametersDefinitionProperty(new MatrixCombinationsParameterDefinition("combinations", "")));
-        
+
         // first run.
         // asserts that only combinations specified with MatrixCombinationsParameterValue are built.
         @SuppressWarnings("deprecation")
         Cause cause = new Cause.UserCause();
-        MatrixBuild b1 = p.scheduleBuild2(0, cause, Arrays.asList(
-                new ParametersAction(new MatrixCombinationsParameterValue(
-                        "combinations",
-                        new Boolean[]{ false, true, false, true },
-                        new String[]{
-                                "axis1=value1-1,axis2=value2-1",
-                                "axis1=value1-2,axis2=value2-1",
-                                "axis1=value1-1,axis2=value2-2",
-                                "axis1=value1-2,axis2=value2-2",
-                        }
-                ))
-        )).get();
+        MatrixBuild b1 = p.scheduleBuild2(
+                        0,
+                        cause,
+                        Arrays.asList(new ParametersAction(new MatrixCombinationsParameterValue(
+                                "combinations", new Boolean[] {false, true, false, true}, new String[] {
+                                    "axis1=value1-1,axis2=value2-1",
+                                    "axis1=value1-2,axis2=value2-1",
+                                    "axis1=value1-1,axis2=value2-2",
+                                    "axis1=value1-2,axis2=value2-2",
+                                }))))
+                .get();
         j.assertBuildStatusSuccess(b1);
         assertNull(b1.getExactRun(new Combination(p.getAxes(), "value1-1", "value2-1")));
         assertNotNull(b1.getExactRun(new Combination(p.getAxes(), "value1-2", "value2-1")));
         assertNull(b1.getExactRun(new Combination(p.getAxes(), "value1-1", "value2-2")));
         assertNotNull(b1.getExactRun(new Combination(p.getAxes(), "value1-2", "value2-2")));
-        
-        
+
         // second run (rebuild)
         // asserts that only combinations in the first run are built.
         WebClient wc = j.createWebClient();
         HtmlPage page = wc.getPage(b1, "rebuild");
         HtmlForm form = page.getFormByName("config");
         j.submit(form);
-        
+
         j.waitUntilNoActivity();
-        
-        MatrixBuild b2  = p.getLastBuild();
+
+        MatrixBuild b2 = p.getLastBuild();
         assertNotEquals(b1.getNumber(), b2.getNumber());
         assertNull(b1.getExactRun(new Combination(p.getAxes(), "value1-1", "value2-1")));
         assertNotNull(b1.getExactRun(new Combination(p.getAxes(), "value1-2", "value2-1")));
@@ -149,35 +143,37 @@ public class MatrixCombinationsRebuildParameterProviderTest
         assertNotNull(b1.getExactRun(new Combination(p.getAxes(), "value1-2", "value2-2")));
     }
 
-    @Ignore("TODO JENKINS-49573: java.lang.ClassCastException: net.sf.json.JSONNull cannot be cast to net.sf.json.JSONObject")
+    @Ignore(
+            "TODO JENKINS-49573: java.lang.ClassCastException: net.sf.json.JSONNull cannot be cast to net.sf.json.JSONObject")
     @Bug(27233)
     @Test
     public void testAppliedForNonMatrixProjectRebuild() throws Exception {
         FreeStyleProject p = j.createFreeStyleProject();
-        
+
         @SuppressWarnings("deprecation")
         Cause cause = new Cause.UserCause();
-        FreeStyleBuild b1 = p.scheduleBuild2(0, cause, Arrays.asList(
-                new ParametersAction(
-                        new MatrixCombinationsParameterValue(
-                                "combinations",
-                                new Boolean[]{ true, false, true },
-                                new String[]{ "axis1=value1", "axis1=value2", "axis1=value3" }
-                        )
-                        // rebuild-plugin causes exception
-                        // when requesting a rebuild with no parameters.
-                        , new StringParameterValue("dummy", "")
-                )
-        )).get();
-        
+        FreeStyleBuild b1 = p.scheduleBuild2(
+                        0,
+                        cause,
+                        Arrays.asList(new ParametersAction(
+                                new MatrixCombinationsParameterValue(
+                                        "combinations",
+                                        new Boolean[] {true, false, true},
+                                        new String[] {"axis1=value1", "axis1=value2", "axis1=value3"})
+                                // rebuild-plugin causes exception
+                                // when requesting a rebuild with no parameters.
+                                ,
+                                new StringParameterValue("dummy", ""))))
+                .get();
+
         WebClient wc = j.createWebClient();
         HtmlPage page = wc.getPage(b1, "rebuild");
         HtmlForm form = page.getFormByName("config");
         j.submit(form);
-        
+
         j.waitUntilNoActivity();
-        
-        FreeStyleBuild b2  = p.getLastBuild();
+
+        FreeStyleBuild b2 = p.getLastBuild();
         assertNotEquals(b1.getNumber(), b2.getNumber());
     }
 
@@ -230,11 +226,7 @@ public class MatrixCombinationsRebuildParameterProviderTest
         MatrixProject p = j.createMatrixProject();
         p.setAxes(axes);
         p.addProperty(new ParametersDefinitionProperty(
-                new MatrixCombinationsParameterDefinition(
-                    "<span id=\"test-not-expected\">combinations</span>",
-                    ""
-                )
-        ));
+                new MatrixCombinationsParameterDefinition("<span id=\"test-not-expected\">combinations</span>", "")));
 
         MatrixBuild b = j.assertBuildStatusSuccess(p.scheduleBuild2(0).get());
 

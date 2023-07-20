@@ -23,31 +23,30 @@
  */
 package hudson.plugins.matrix_configuration_parameter;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import hudson.model.Result;
 import hudson.model.SimpleParameterDefinition;
 import hudson.plugins.matrix_configuration_parameter.shortcut.MatrixCombinationsShortcut;
 import hudson.plugins.matrix_configuration_parameter.shortcut.MatrixCombinationsShortcutDescriptor;
 import hudson.plugins.matrix_configuration_parameter.shortcut.ResultShortcut;
-import net.sf.json.JSONObject;
-
 import java.util.Arrays;
 import java.util.List;
-
 import javax.annotation.Nonnull;
-
+import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 
 public class MatrixCombinationsParameterDefinition extends SimpleParameterDefinition {
 
     private static final long serialVersionUID = 1L;
     private final String defaultCombinationFilter;
-    @SuppressFBWarnings(value="SE_BAD_FIELD", justification="For whatever reason ParameterDefinition is defined as Serializable though only XStream actually serializes it.")
+
+    @SuppressFBWarnings(
+            value = "SE_BAD_FIELD",
+            justification =
+                    "For whatever reason ParameterDefinition is defined as Serializable though only XStream actually serializes it.")
     private final List<MatrixCombinationsShortcut> shortcutList;
 
     /**
@@ -72,11 +71,10 @@ public class MatrixCombinationsParameterDefinition extends SimpleParameterDefini
      */
     public static List<MatrixCombinationsShortcut> getDefaultShortcutList() {
         return Arrays.asList(
-            new ResultShortcut("Successful", false, Result.SUCCESS),
-            new ResultShortcut("Failed", false, Result.FAILURE),
-            new MatrixCombinationsShortcut.All(),
-            new MatrixCombinationsShortcut.None()
-        );
+                new ResultShortcut("Successful", false, Result.SUCCESS),
+                new ResultShortcut("Failed", false, Result.FAILURE),
+                new MatrixCombinationsShortcut.All(),
+                new MatrixCombinationsShortcut.None());
     }
 
     /**
@@ -89,9 +87,14 @@ public class MatrixCombinationsParameterDefinition extends SimpleParameterDefini
      * @since 1.1.0
      */
     @DataBoundConstructor
-    public MatrixCombinationsParameterDefinition(String name, String description, String defaultCombinationFilter, List<MatrixCombinationsShortcut> shortcutList) {
+    public MatrixCombinationsParameterDefinition(
+            String name,
+            String description,
+            String defaultCombinationFilter,
+            List<MatrixCombinationsShortcut> shortcutList) {
         super(name, description);
-        this.defaultCombinationFilter = !StringUtils.isBlank(defaultCombinationFilter)?defaultCombinationFilter:null;
+        this.defaultCombinationFilter =
+                !StringUtils.isBlank(defaultCombinationFilter) ? defaultCombinationFilter : null;
         this.shortcutList = (shortcutList != null) ? shortcutList : getDefaultShortcutList();
     }
 
@@ -103,7 +106,7 @@ public class MatrixCombinationsParameterDefinition extends SimpleParameterDefini
         this(name, description, null);
     }
 
-    @SuppressFBWarnings(value="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT", justification="This is not normal.")
+    @SuppressFBWarnings(value = "RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT", justification = "This is not normal.")
     private Object readResolve() {
         boolean shortcutListMissing = false;
         if (shortcutList == null) {
@@ -117,7 +120,8 @@ public class MatrixCombinationsParameterDefinition extends SimpleParameterDefini
         }
         if (shortcutListMissing) {
             // the one from < 1.1.0
-            return new MatrixCombinationsParameterDefinition(getName(), getDescription(), getDefaultCombinationFilter());
+            return new MatrixCombinationsParameterDefinition(
+                    getName(), getDescription(), getDefaultCombinationFilter());
         }
         return this;
     }
@@ -134,11 +138,7 @@ public class MatrixCombinationsParameterDefinition extends SimpleParameterDefini
      */
     @Override
     public MatrixCombinationsParameterValue createValue(String value) {
-        return new DefaultMatrixCombinationsParameterValue(
-            getName(),
-            getDescription(),
-            value
-        );
+        return new DefaultMatrixCombinationsParameterValue(getName(), getDescription(), value);
     }
 
     @Override
@@ -148,8 +148,6 @@ public class MatrixCombinationsParameterDefinition extends SimpleParameterDefini
 
     @Extension
     public static class DescriptorImpl extends ParameterDescriptor {
-
-
 
         @Override
         public String getDisplayName() {
@@ -168,10 +166,9 @@ public class MatrixCombinationsParameterDefinition extends SimpleParameterDefini
         public List<MatrixCombinationsShortcut> getDefaultShortcutList() {
             return MatrixCombinationsParameterDefinition.getDefaultShortcutList();
         }
-        
+
         public List<MatrixCombinationsShortcutDescriptor> getShortcutDescriptorList() {
             return MatrixCombinationsShortcutDescriptor.all();
         }
     }
-
 }

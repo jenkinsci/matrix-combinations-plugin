@@ -24,14 +24,6 @@
 
 package hudson.plugins.matrix_configuration_parameter.shortcut;
 
-import java.util.Arrays;
-
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.jvnet.hudson.test.JenkinsRule.WebClient;
-
-import org.htmlunit.html.HtmlPage;
-
 import hudson.matrix.AxisList;
 import hudson.matrix.MatrixProject;
 import hudson.matrix.TextAxis;
@@ -39,6 +31,11 @@ import hudson.model.Item;
 import hudson.model.ParametersDefinitionProperty;
 import hudson.plugins.matrix_configuration_parameter.MatrixCombinationsJenkinsRule;
 import hudson.plugins.matrix_configuration_parameter.MatrixCombinationsParameterDefinition;
+import java.util.Arrays;
+import org.htmlunit.html.HtmlPage;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.jvnet.hudson.test.JenkinsRule.WebClient;
 
 /**
  * Tests for {@link CombinationFilterShortcut}
@@ -50,51 +47,35 @@ public class CombinationFilterShortcutTest {
     @Test
     public void testConfiguration() throws Exception {
         AxisList axes = new AxisList(
-            new TextAxis("axis1", "value1-1", "value2-1"),
-            new TextAxis("axis2", "value2-1", "value2-2")
-        );
+                new TextAxis("axis1", "value1-1", "value2-1"), new TextAxis("axis2", "value2-1", "value2-2"));
         MatrixProject p = j.createMatrixProject();
         p.setAxes(axes);
         MatrixCombinationsParameterDefinition def = new MatrixCombinationsParameterDefinition(
-            "COMBINATIONS",
-            "",
-            "",
-            Arrays.<MatrixCombinationsShortcut>asList(
-                new CombinationFilterShortcut(
-                    "FILTER",
-                    "!(axis1 == 'value1-2' && axis2 == 'value2-2')"
-                )
-            )
-        );
+                "COMBINATIONS",
+                "",
+                "",
+                Arrays.<MatrixCombinationsShortcut>asList(
+                        new CombinationFilterShortcut("FILTER", "!(axis1 == 'value1-2' && axis2 == 'value2-2')")));
         p.addProperty(new ParametersDefinitionProperty(def));
 
-        j.configRoundtrip((Item)p);
+        j.configRoundtrip((Item) p);
 
         j.assertEqualDataBoundBeans(
-            def,
-            p.getProperty(ParametersDefinitionProperty.class).getParameterDefinition("COMBINATIONS")
-        );
+                def, p.getProperty(ParametersDefinitionProperty.class).getParameterDefinition("COMBINATIONS"));
     }
 
     @Test
     public void testCheck() throws Exception {
         AxisList axes = new AxisList(
-            new TextAxis("axis1", "value1-1", "value1-2"),
-            new TextAxis("axis2", "value2-1", "value2-2")
-        );
+                new TextAxis("axis1", "value1-1", "value1-2"), new TextAxis("axis2", "value2-1", "value2-2"));
         MatrixProject p = j.createMatrixProject();
         p.setAxes(axes);
         MatrixCombinationsParameterDefinition def = new MatrixCombinationsParameterDefinition(
-            "COMBINATIONS",
-            "",
-            "",
-            Arrays.<MatrixCombinationsShortcut>asList(
-                new CombinationFilterShortcut(
-                    "FILTER",
-                    "!(axis1 == 'value1-2' && axis2 == 'value2-2')"
-                )
-            )
-        );
+                "COMBINATIONS",
+                "",
+                "",
+                Arrays.<MatrixCombinationsShortcut>asList(
+                        new CombinationFilterShortcut("FILTER", "!(axis1 == 'value1-2' && axis2 == 'value2-2')")));
         p.addProperty(new ParametersDefinitionProperty(def));
 
         WebClient wc = j.createAllow405WebClient();
@@ -112,16 +93,10 @@ public class CombinationFilterShortcutTest {
     public void testCheckEmpty() throws Exception {
         MatrixProject p = j.createMatrixProject();
         MatrixCombinationsParameterDefinition def = new MatrixCombinationsParameterDefinition(
-            "COMBINATIONS",
-            "",
-            "",
-            Arrays.<MatrixCombinationsShortcut>asList(
-                new CombinationFilterShortcut(
-                    "FILTER",
-                    ""
-                )
-            )
-        );
+                "COMBINATIONS",
+                "",
+                "",
+                Arrays.<MatrixCombinationsShortcut>asList(new CombinationFilterShortcut("FILTER", "")));
         p.addProperty(new ParametersDefinitionProperty(def));
 
         WebClient wc = j.createAllow405WebClient();
