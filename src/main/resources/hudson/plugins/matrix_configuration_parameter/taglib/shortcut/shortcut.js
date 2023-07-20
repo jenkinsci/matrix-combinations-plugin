@@ -23,20 +23,21 @@
  */
 
 Behaviour.specify(".matrix-combinations-parameter .shortcut", "matrix-combinations-parameter-shortcut", 0, function (e) {
-  e.observe("click", function(e) {
-    var combinations = this.readAttribute("data-combinations");
+  e.addEventListener("click", function(e) {
+    var combinations = this.getAttribute("data-combinations");
     if (!combinations) {
         combinations = "";
     }
     var indexToCheck = combinations.split(",");
-    var block = this.up(".matrix-combinations-parameter");
-    block.select(".combination").each(function(c) {
-      var combination = c.readAttribute("data-combination");
+    var block = this.closest(".matrix-combinations-parameter");
+    block.querySelectorAll(".combination").forEach(function(c) {
+      var combination = c.getAttribute("data-combination");
       var toCheck = combination && (indexToCheck.indexOf(combination) >= 0);
-      c.select("input[type='checkbox']").each(function(checkbox) {
+      c.querySelectorAll("input[type='checkbox']").forEach(function(checkbox) {
         checkbox.checked = toCheck;
       });
     });
-    Event.stop(e);
+    e.preventDefault();
+    e.stopPropagation();
   });
 });
