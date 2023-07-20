@@ -24,21 +24,10 @@
 
 package hudson.plugins.matrix_configuration_parameter.shortcut;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import javax.annotation.Nonnull;
-
-import org.apache.commons.lang.StringUtils;
-import org.kohsuke.stapler.DataBoundConstructor;
-
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
-
 import hudson.Extension;
 import hudson.Util;
 import hudson.matrix.Combination;
@@ -47,6 +36,13 @@ import hudson.matrix.MatrixProject;
 import hudson.matrix.MatrixRun;
 import hudson.model.Result;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import javax.annotation.Nonnull;
+import org.apache.commons.lang.StringUtils;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
  * Shortcut to select combinations based on build results
@@ -69,9 +65,8 @@ public class ResultShortcut extends MatrixCombinationsShortcut {
     public ResultShortcut(String name, boolean exact, List<String> resultsToCheck) {
         this.name = Util.fixNull(name);
         this.exact = exact;
-        this.resultsToCheck = (resultsToCheck != null)
-            ? new ArrayList<>(resultsToCheck)
-            : Collections.<String>emptyList();
+        this.resultsToCheck =
+                (resultsToCheck != null) ? new ArrayList<>(resultsToCheck) : Collections.<String>emptyList();
     }
 
     /**
@@ -82,12 +77,11 @@ public class ResultShortcut extends MatrixCombinationsShortcut {
      * @param results results to check
      */
     public ResultShortcut(String name, boolean exact, Result... results) {
-        this(name, exact, Lists.transform(
-            Arrays.asList(results),
-            new Function<Result, String>() {
-                public String apply(Result result) {
-                    return result.toString();
-                }
+        this(name, exact, Lists.transform(Arrays.asList(results), new Function<Result, String>() {
+            @Override
+            public String apply(Result result) {
+                return result.toString();
+            }
         }));
     }
 
@@ -131,29 +125,27 @@ public class ResultShortcut extends MatrixCombinationsShortcut {
             return Collections.emptyList();
         }
         return Collections2.transform(
-            Collections2.filter(
-                isExact() ? build.getExactRuns() : build.getRuns(),
-                new Predicate<MatrixRun>() {
+                Collections2.filter(isExact() ? build.getExactRuns() : build.getRuns(), new Predicate<MatrixRun>() {
+                    @Override
                     public boolean apply(MatrixRun run) {
                         Result result = run.getResult();
                         if (result == null) {
                             return false;
                         }
-                        for (String s: getResultsToCheck()) {
+                        for (String s : getResultsToCheck()) {
                             if (result.equals(Result.fromString(s))) {
                                 return true;
                             }
                         }
                         return false;
                     }
-                }
-            ),
-            new Function<MatrixRun, Combination>() {
-                public Combination apply(MatrixRun r) {
-                    return r.getParent().getCombination();
-                }
-            }
-        );
+                }),
+                new Function<MatrixRun, Combination>() {
+                    @Override
+                    public Combination apply(MatrixRun r) {
+                        return r.getParent().getCombination();
+                    }
+                });
     }
 
     @Extension

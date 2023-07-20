@@ -24,23 +24,19 @@
 
 package hudson.plugins.matrix_configuration_parameter.shortcut;
 
-import java.util.Collection;
-
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-
-import org.kohsuke.stapler.DataBoundConstructor;
-
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
-
 import hudson.Extension;
 import hudson.Util;
 import hudson.matrix.Combination;
 import hudson.matrix.MatrixBuild;
 import hudson.matrix.MatrixConfiguration;
 import hudson.matrix.MatrixProject;
+import java.util.Collection;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
  * Shortcuts to select combinations with a filter expression
@@ -75,24 +71,21 @@ public class CombinationFilterShortcut extends MatrixCombinationsShortcut {
     @Nonnull
     @Override
     public Collection<Combination> getCombinations(
-        @Nonnull final MatrixProject project,
-        @CheckForNull MatrixBuild build
-    ) {
+            @Nonnull final MatrixProject project, @CheckForNull MatrixBuild build) {
         return Collections2.filter(
-            Collections2.transform(
-                project.getActiveConfigurations(),
-                new Function<MatrixConfiguration, Combination>() {
-                    public Combination apply(MatrixConfiguration c) {
-                        return c.getCombination();
+                Collections2.transform(
+                        project.getActiveConfigurations(), new Function<MatrixConfiguration, Combination>() {
+                            @Override
+                            public Combination apply(MatrixConfiguration c) {
+                                return c.getCombination();
+                            }
+                        }),
+                new Predicate<Combination>() {
+                    @Override
+                    public boolean apply(Combination c) {
+                        return c.evalGroovyExpression(project.getAxes(), getCombinationFilter());
                     }
-                }
-            ),
-            new Predicate<Combination>() {
-                public boolean apply(Combination c) {
-                    return c.evalGroovyExpression(project.getAxes(), getCombinationFilter());
-                }
-            }
-        );
+                });
     }
 
     /**
@@ -108,10 +101,7 @@ public class CombinationFilterShortcut extends MatrixCombinationsShortcut {
      */
     @Override
     public String getId() {
-        return String.format(
-            "filter-%s",
-            getName().replaceAll("[^A-Za-z0-9]+", "-")
-        );
+        return String.format("filter-%s", getName().replaceAll("[^A-Za-z0-9]+", "-"));
     }
 
     /**

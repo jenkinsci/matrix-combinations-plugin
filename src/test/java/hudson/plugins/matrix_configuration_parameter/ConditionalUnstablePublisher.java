@@ -24,8 +24,6 @@
 
 package hudson.plugins.matrix_configuration_parameter;
 
-import java.io.IOException;
-
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.Launcher;
@@ -37,6 +35,7 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
+import java.io.IOException;
 
 /**
  *
@@ -44,11 +43,10 @@ import hudson.tasks.Recorder;
 public class ConditionalUnstablePublisher extends Recorder {
     private final String value1;
     private final String value2;
-    
-    
+
     /**
      * Create a builder getting unstable when value1 == value2. Values are expanded.
-     * 
+     *
      * @param value1
      * @param value2
      */
@@ -56,23 +54,26 @@ public class ConditionalUnstablePublisher extends Recorder {
         this.value1 = value1;
         this.value2 = value2;
     }
-    
+
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
             throws InterruptedException, IOException {
         EnvVars env = build.getEnvironment(listener);
         String value1 = env.expand(this.value1);
         String value2 = env.expand(this.value2);
-        
-        if(value1.equals(value2)) {
+
+        if (value1.equals(value2)) {
             build.setResult(Result.UNSTABLE);
-            listener.getLogger().println(String.format("Unstable as %s (%s) == %s (%s)", this.value1, value1, this.value2, value2));
+            listener.getLogger()
+                    .println(String.format("Unstable as %s (%s) == %s (%s)", this.value1, value1, this.value2, value2));
             return true;
         }
-        listener.getLogger().println(String.format("Passed as %s (%s) != %s (%s)", this.value1, value1, this.value2, value2));
+        listener.getLogger()
+                .println(String.format("Passed as %s (%s) != %s (%s)", this.value1, value1, this.value2, value2));
         return true;
     }
 
+    @Override
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.NONE;
     }

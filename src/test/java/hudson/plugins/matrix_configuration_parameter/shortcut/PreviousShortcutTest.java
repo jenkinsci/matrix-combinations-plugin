@@ -26,14 +26,6 @@ package hudson.plugins.matrix_configuration_parameter.shortcut;
 
 import static org.junit.Assert.assertNull;
 
-import java.util.Arrays;
-
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.jvnet.hudson.test.JenkinsRule.WebClient;
-
-import org.htmlunit.html.HtmlPage;
-
 import hudson.matrix.AxisList;
 import hudson.matrix.Combination;
 import hudson.matrix.MatrixBuild;
@@ -45,6 +37,11 @@ import hudson.model.Result;
 import hudson.plugins.matrix_configuration_parameter.ConditionalFailBuilder;
 import hudson.plugins.matrix_configuration_parameter.MatrixCombinationsJenkinsRule;
 import hudson.plugins.matrix_configuration_parameter.MatrixCombinationsParameterDefinition;
+import java.util.Arrays;
+import org.htmlunit.html.HtmlPage;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.jvnet.hudson.test.JenkinsRule.WebClient;
 
 /**
  * Tests for {@link PreviousShortcut}
@@ -59,19 +56,13 @@ public class PreviousShortcutTest {
         MatrixProject p = j.createMatrixProject();
         p.setAxes(axes);
         MatrixCombinationsParameterDefinition def = new MatrixCombinationsParameterDefinition(
-            "COMBINATIONS",
-            "",
-            "",
-            Arrays.<MatrixCombinationsShortcut>asList(new PreviousShortcut())
-        );
+                "COMBINATIONS", "", "", Arrays.<MatrixCombinationsShortcut>asList(new PreviousShortcut()));
         p.addProperty(new ParametersDefinitionProperty(def));
 
-        j.configRoundtrip((Item)p);
+        j.configRoundtrip((Item) p);
 
         j.assertEqualDataBoundBeans(
-            def,
-            p.getProperty(ParametersDefinitionProperty.class).getParameterDefinition("COMBINATIONS")
-        );
+                def, p.getProperty(ParametersDefinitionProperty.class).getParameterDefinition("COMBINATIONS"));
     }
 
     @Test
@@ -80,11 +71,7 @@ public class PreviousShortcutTest {
         MatrixProject p = j.createMatrixProject();
         p.setAxes(axes);
         MatrixCombinationsParameterDefinition def = new MatrixCombinationsParameterDefinition(
-            "COMBINATIONS",
-            "",
-            "",
-            Arrays.<MatrixCombinationsShortcut>asList(new PreviousShortcut())
-        );
+                "COMBINATIONS", "", "", Arrays.<MatrixCombinationsShortcut>asList(new PreviousShortcut()));
         p.addProperty(new ParametersDefinitionProperty(def));
         p.getBuildersList().add(new ConditionalFailBuilder("${axis1}", "value2"));
 
@@ -120,11 +107,7 @@ public class PreviousShortcutTest {
         MatrixProject p = j.createMatrixProject();
         p.setAxes(axes);
         MatrixCombinationsParameterDefinition def = new MatrixCombinationsParameterDefinition(
-            "COMBINATIONS",
-            "",
-            "",
-            Arrays.<MatrixCombinationsShortcut>asList(new PreviousShortcut())
-        );
+                "COMBINATIONS", "", "", Arrays.<MatrixCombinationsShortcut>asList(new PreviousShortcut()));
         p.addProperty(new ParametersDefinitionProperty(def));
         p.setCombinationFilter("axis1 != 'value3'");
         p.getBuildersList().add(new ConditionalFailBuilder("${axis1}", "value2"));
@@ -145,11 +128,7 @@ public class PreviousShortcutTest {
         MatrixProject p = j.createMatrixProject();
         p.setAxes(axes);
         MatrixCombinationsParameterDefinition def = new MatrixCombinationsParameterDefinition(
-            "COMBINATIONS",
-            "",
-            "",
-            Arrays.<MatrixCombinationsShortcut>asList(new PreviousShortcut())
-        );
+                "COMBINATIONS", "", "", Arrays.<MatrixCombinationsShortcut>asList(new PreviousShortcut()));
         p.addProperty(new ParametersDefinitionProperty(def));
         p.getBuildersList().add(new ConditionalFailBuilder("${axis1}", "value2"));
 

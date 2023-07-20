@@ -23,29 +23,24 @@
  */
 package hudson.plugins.matrix_configuration_parameter;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+import hudson.markup.MarkupFormatter;
+import hudson.matrix.AxisList;
+import hudson.matrix.Combination;
+import hudson.model.AbstractBuild;
+import hudson.model.ParameterValue;
+import hudson.util.VariableResolver;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.annotation.Nonnull;
-
-import hudson.markup.MarkupFormatter;
-import hudson.matrix.AxisList;
-import hudson.matrix.Combination;
-import hudson.model.*;
-
-import hudson.util.VariableResolver;
 import jenkins.model.Jenkins;
-
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
-
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
-
 
 public class MatrixCombinationsParameterValue extends ParameterValue {
     private static final long serialVersionUID = 1L;
@@ -56,6 +51,7 @@ public class MatrixCombinationsParameterValue extends ParameterValue {
 
     @Deprecated
     transient Boolean[] values;
+
     @Deprecated
     transient String[] confs;
 
@@ -68,10 +64,9 @@ public class MatrixCombinationsParameterValue extends ParameterValue {
      */
     @DataBoundConstructor
     public MatrixCombinationsParameterValue(String name, String description, List<String> combinations) {
-        super(name,  description);
-        this.combinations = (combinations != null)
-            ? Collections.unmodifiableList(combinations)
-            : Collections.<String>emptyList();
+        super(name, description);
+        this.combinations =
+                (combinations != null) ? Collections.unmodifiableList(combinations) : Collections.<String>emptyList();
     }
 
     @Deprecated
@@ -131,32 +126,32 @@ public class MatrixCombinationsParameterValue extends ParameterValue {
     @Override
     public VariableResolver<String> createVariableResolver(AbstractBuild<?, ?> build) {
         return new VariableResolver<String>() {
+            @Override
             public String resolve(String name) {
                 if (!MatrixCombinationsParameterValue.this.name.equals(name)) {
                     return null;
                 }
 
-                return StringUtils.join(Lists.transform(
-                    getCombinations(),
-                    new Function<String, String>() {
-                        public String apply(String combination) {
-                            return String.format(
-                                "(%s')",
-                                combination.replace("=", " == '").replace(",", "' && ")
-                            );
-                        }
-                    }
-                ), " || ");
+                return StringUtils.join(
+                        Lists.transform(getCombinations(), new Function<String, String>() {
+                            @Override
+                            public String apply(String combination) {
+                                return String.format(
+                                        "(%s')",
+                                        combination.replace("=", " == '").replace(",", "' && "));
+                            }
+                        }),
+                        " || ");
             }
         };
     }
 
-    public boolean combinationExists(AxisList axes, Combination c){
+    public boolean combinationExists(AxisList axes, Combination c) {
         return getCombinations().contains(c.toString());
     }
 
     @Deprecated
-    public boolean combinationExists(Combination c){
+    public boolean combinationExists(Combination c) {
         return combinationExists(null, c);
     }
 
@@ -179,16 +174,16 @@ public class MatrixCombinationsParameterValue extends ParameterValue {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        MatrixCombinationsParameterValue other = (MatrixCombinationsParameterValue)obj;
+        MatrixCombinationsParameterValue other = (MatrixCombinationsParameterValue) obj;
 
         return getCombinations().equals(other.getCombinations());
     }
 
     @Override
     public String toString() {
-        StringBuffer valueStr= new StringBuffer("");
-        valueStr.append("(MatrixCombinationsParameterValue) " + getName()+"\n");
-        for (String combination: getCombinations()) {
+        StringBuffer valueStr = new StringBuffer("");
+        valueStr.append("(MatrixCombinationsParameterValue) " + getName() + "\n");
+        for (String combination : getCombinations()) {
             valueStr.append(String.format("%s%n", combination));
         }
         return valueStr.toString();
@@ -201,17 +196,16 @@ public class MatrixCombinationsParameterValue extends ParameterValue {
      *
      * @since 1.2.0
      */
+    @Override
     public String getFormattedDescription() {
         try {
             return Jenkins.getActiveInstance().getMarkupFormatter().translate(getDescription());
         } catch (IOException e) {
             LOGGER.log(
-                Level.WARNING,
-                "failed to translate description using configured markup formatter: {0}",
-                getDescription()
-            );
+                    Level.WARNING,
+                    "failed to translate description using configured markup formatter: {0}",
+                    getDescription());
             return "";
         }
     }
-
 }

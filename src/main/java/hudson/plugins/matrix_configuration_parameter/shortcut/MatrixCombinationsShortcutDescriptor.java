@@ -24,19 +24,16 @@
 
 package hudson.plugins.matrix_configuration_parameter.shortcut;
 
-import java.util.List;
-
 import hudson.model.Descriptor;
+import java.util.List;
 import jenkins.model.Jenkins;
 
 /**
  * Descriptor for {@link MatrixCombinationsShortcut}
- * 
+ *
  * @since 1.1.0
  */
-public abstract class MatrixCombinationsShortcutDescriptor
-        extends Descriptor<MatrixCombinationsShortcut>
-{
+public abstract class MatrixCombinationsShortcutDescriptor extends Descriptor<MatrixCombinationsShortcut> {
     public static List<MatrixCombinationsShortcutDescriptor> all() {
         return Jenkins.getActiveInstance().getDescriptorList(MatrixCombinationsShortcut.class);
     }
