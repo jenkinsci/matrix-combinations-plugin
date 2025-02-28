@@ -94,10 +94,7 @@ THE SOFTWARE.
         </table>
       </j:otherwise>
     </j:choose>
-    <j:if test="${ajax==null and attrs.autoRefresh and !h.isAutoRefresh(request)}">
-      <script defer="defer">
-        refreshPart('matrix',"./ajaxMatrix");
-      </script>
-    </j:if>
+    <span class="matrix-auto-refresh-data" data-should-auto-refresh="${ajax==null and attrs.autoRefresh and !h.isAutoRefresh(request)}"/>
+    <st:adjunct includes="hudson.plugins.matrix_configuration_parameter.taglib.matrix.matrix"/>
   </div>
 </j:jelly>
