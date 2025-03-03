@@ -36,7 +36,7 @@ import javax.annotation.Nonnull;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest2;
 
 public class MatrixCombinationsParameterDefinition extends SimpleParameterDefinition {
 
@@ -127,7 +127,7 @@ public class MatrixCombinationsParameterDefinition extends SimpleParameterDefini
     }
 
     @Override
-    public MatrixCombinationsParameterValue createValue(StaplerRequest req, JSONObject jo) {
+    public MatrixCombinationsParameterValue createValue(StaplerRequest2 req, JSONObject jo) {
         MatrixCombinationsParameterValue value = req.bindJSON(MatrixCombinationsParameterValue.class, jo);
         value.setDescription(getDescription());
         return value;
