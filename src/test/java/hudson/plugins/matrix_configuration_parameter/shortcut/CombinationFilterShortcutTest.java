@@ -31,7 +31,7 @@ import hudson.model.Item;
 import hudson.model.ParametersDefinitionProperty;
 import hudson.plugins.matrix_configuration_parameter.MatrixCombinationsJenkinsRule;
 import hudson.plugins.matrix_configuration_parameter.MatrixCombinationsParameterDefinition;
-import java.util.Arrays;
+import java.util.List;
 import org.htmlunit.html.HtmlPage;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -54,8 +54,7 @@ public class CombinationFilterShortcutTest {
                 "COMBINATIONS",
                 "",
                 "",
-                Arrays.<MatrixCombinationsShortcut>asList(
-                        new CombinationFilterShortcut("FILTER", "!(axis1 == 'value1-2' && axis2 == 'value2-2')")));
+                List.of(new CombinationFilterShortcut("FILTER", "!(axis1 == 'value1-2' && axis2 == 'value2-2')")));
         p.addProperty(new ParametersDefinitionProperty(def));
 
         j.configRoundtrip((Item) p);
@@ -74,8 +73,7 @@ public class CombinationFilterShortcutTest {
                 "COMBINATIONS",
                 "",
                 "",
-                Arrays.<MatrixCombinationsShortcut>asList(
-                        new CombinationFilterShortcut("FILTER", "!(axis1 == 'value1-2' && axis2 == 'value2-2')")));
+                List.of(new CombinationFilterShortcut("FILTER", "!(axis1 == 'value1-2' && axis2 == 'value2-2')")));
         p.addProperty(new ParametersDefinitionProperty(def));
 
         WebClient wc = j.createAllow405WebClient();
@@ -93,10 +91,7 @@ public class CombinationFilterShortcutTest {
     public void testCheckEmpty() throws Exception {
         MatrixProject p = j.createMatrixProject();
         MatrixCombinationsParameterDefinition def = new MatrixCombinationsParameterDefinition(
-                "COMBINATIONS",
-                "",
-                "",
-                Arrays.<MatrixCombinationsShortcut>asList(new CombinationFilterShortcut("FILTER", "")));
+                "COMBINATIONS", "", "", List.of(new CombinationFilterShortcut("FILTER", "")));
         p.addProperty(new ParametersDefinitionProperty(def));
 
         WebClient wc = j.createAllow405WebClient();

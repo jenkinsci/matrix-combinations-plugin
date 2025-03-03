@@ -24,7 +24,6 @@
 
 package hudson.plugins.matrix_configuration_parameter.shortcut;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -32,7 +31,6 @@ import hudson.Extension;
 import hudson.matrix.Combination;
 import hudson.matrix.MatrixBuild;
 import hudson.matrix.MatrixProject;
-import hudson.matrix.MatrixRun;
 import java.util.Collection;
 import java.util.Collections;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -53,12 +51,7 @@ public class PreviousShortcut extends MatrixCombinationsShortcut {
         if (build == null) {
             return Collections.emptyList();
         }
-        return Lists.transform(build.getExactRuns(), new Function<MatrixRun, Combination>() {
-            @Override
-            public Combination apply(MatrixRun r) {
-                return r.getParent().getCombination();
-            }
-        });
+        return Lists.transform(build.getExactRuns(), r -> r.getParent().getCombination());
     }
 
     /**
@@ -87,6 +80,7 @@ public class PreviousShortcut extends MatrixCombinationsShortcut {
         /**
          * {@inheritDoc}
          */
+        @NonNull
         @Override
         public String getDisplayName() {
             return Messages.PreviousShortcut_DisplayName();

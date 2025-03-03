@@ -24,10 +24,10 @@
 
 package hudson.plugins.matrix_configuration_parameter;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 
 import hudson.XmlFile;
 import hudson.cli.BuildCommand;
@@ -48,14 +48,14 @@ import hudson.model.Run;
 import java.io.File;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 import org.htmlunit.HttpMethod;
 import org.htmlunit.WebRequest;
 import org.htmlunit.html.HtmlForm;
 import org.htmlunit.html.HtmlPage;
 import org.junit.Rule;
 import org.junit.Test;
-import org.jvnet.hudson.test.Bug;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
 import org.jvnet.hudson.test.SleepBuilder;
@@ -384,7 +384,7 @@ public class MatrixCombinationsParameterDefinitionTest {
         }
     }
 
-    @Bug(23230)
+    @Issue("JENKINS-23230")
     @Test
     public void testInvalidAxis() throws Exception {
         MatrixProject p = j.createMatrixProject();
@@ -413,7 +413,7 @@ public class MatrixCombinationsParameterDefinitionTest {
         assertNull(b.getExactRun(new Combination(axes, "value3")));
     }
 
-    @Bug(28824)
+    @Issue("JENKINS-28824")
     @Test
     public void testBuildPageForBuilding() throws Exception {
         MatrixProject p = j.createMatrixProject();
@@ -424,7 +424,7 @@ public class MatrixCombinationsParameterDefinitionTest {
         p.addProperty(
                 new ParametersDefinitionProperty(new MatrixCombinationsParameterDefinition("combinations", "", "")));
 
-        p.getBuildersList().add(new SleepBuilder(5000));
+        p.getBuildersList().add(new SleepBuilder(20000));
 
         MatrixBuild b = p.scheduleBuild2(0).waitForStart();
 
@@ -584,8 +584,9 @@ public class MatrixCombinationsParameterDefinitionTest {
                 new ParametersDefinitionProperty(new MatrixCombinationsParameterDefinition("combinations", "", "")));
 
         WebClient wc = j.createWebClient();
-        URL url = new URL(wc.createCrumbedUrl(p.getUrl() + "buildWithParameters")
-                        .toString() + "&combinations=" + URLEncoder.encode("axis1 != 'value2'", "UTF-8"));
+        URL url =
+                new URL(wc.createCrumbedUrl(p.getUrl() + "buildWithParameters").toString() + "&combinations="
+                        + URLEncoder.encode("axis1 != 'value2'", StandardCharsets.UTF_8));
         WebRequest request = new WebRequest(url, HttpMethod.POST);
         wc.getPage(request);
 
@@ -624,7 +625,7 @@ public class MatrixCombinationsParameterDefinitionTest {
         MatrixBuild b = j.assertBuildStatusSuccess(p.scheduleBuild2(
                 0,
                 (Cause) null,
-                new ParametersAction(new MatrixCombinationsParameterValue("x", "", Arrays.asList("x=b,y=2")))));
+                new ParametersAction(new MatrixCombinationsParameterValue("x", "", List.of("x=b,y=2")))));
         b.save();
         System.out.println(new XmlFile(Run.XSTREAM, new File(b.getRootDir(), "build.xml")).asString());
         p.save();

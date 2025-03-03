@@ -31,6 +31,7 @@ import hudson.model.SimpleParameterDefinition;
 import hudson.plugins.matrix_configuration_parameter.shortcut.MatrixCombinationsShortcut;
 import hudson.plugins.matrix_configuration_parameter.shortcut.MatrixCombinationsShortcutDescriptor;
 import hudson.plugins.matrix_configuration_parameter.shortcut.ResultShortcut;
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.List;
 import net.sf.json.JSONObject;
@@ -40,7 +41,9 @@ import org.kohsuke.stapler.StaplerRequest2;
 
 public class MatrixCombinationsParameterDefinition extends SimpleParameterDefinition {
 
+    @Serial
     private static final long serialVersionUID = 1L;
+
     private final String defaultCombinationFilter;
 
     @SuppressFBWarnings(
@@ -92,7 +95,8 @@ public class MatrixCombinationsParameterDefinition extends SimpleParameterDefini
             String description,
             String defaultCombinationFilter,
             List<MatrixCombinationsShortcut> shortcutList) {
-        super(name, description);
+        super(name);
+        setDescription(description);
         this.defaultCombinationFilter =
                 !StringUtils.isBlank(defaultCombinationFilter) ? defaultCombinationFilter : null;
         this.shortcutList = (shortcutList != null) ? shortcutList : getDefaultShortcutList();
@@ -106,6 +110,7 @@ public class MatrixCombinationsParameterDefinition extends SimpleParameterDefini
         this(name, description, null);
     }
 
+    @Serial
     @SuppressFBWarnings(value = "RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT", justification = "This is not normal.")
     private Object readResolve() {
         boolean shortcutListMissing = false;
@@ -149,6 +154,7 @@ public class MatrixCombinationsParameterDefinition extends SimpleParameterDefini
     @Extension
     public static class DescriptorImpl extends ParameterDescriptor {
 
+        @NonNull
         @Override
         public String getDisplayName() {
             return "Matrix Combinations Parameter";

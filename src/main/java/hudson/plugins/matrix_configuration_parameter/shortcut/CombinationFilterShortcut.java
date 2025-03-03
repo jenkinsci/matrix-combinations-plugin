@@ -24,8 +24,6 @@
 
 package hudson.plugins.matrix_configuration_parameter.shortcut;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -72,24 +70,14 @@ public class CombinationFilterShortcut extends MatrixCombinationsShortcut {
     @Override
     public Collection<Combination> getCombinations(@NonNull final MatrixProject project, @Nullable MatrixBuild build) {
         return Collections2.filter(
-                Collections2.transform(
-                        project.getActiveConfigurations(), new Function<MatrixConfiguration, Combination>() {
-                            @Override
-                            public Combination apply(MatrixConfiguration c) {
-                                return c.getCombination();
-                            }
-                        }),
-                new Predicate<Combination>() {
-                    @Override
-                    public boolean apply(Combination c) {
-                        return c.evalGroovyExpression(project.getAxes(), getCombinationFilter());
-                    }
-                });
+                Collections2.transform(project.getActiveConfigurations(), MatrixConfiguration::getCombination),
+                c -> c.evalGroovyExpression(project.getAxes(), getCombinationFilter()));
     }
 
     /**
      * {@inheritDoc}
      */
+    @NonNull
     @Override
     public String getName() {
         return name;
@@ -98,6 +86,7 @@ public class CombinationFilterShortcut extends MatrixCombinationsShortcut {
     /**
      * {@inheritDoc}
      */
+    @NonNull
     @Override
     public String getId() {
         return String.format("filter-%s", getName().replaceAll("[^A-Za-z0-9]+", "-"));
@@ -111,6 +100,7 @@ public class CombinationFilterShortcut extends MatrixCombinationsShortcut {
         /**
          * {@inheritDoc}
          */
+        @NonNull
         @Override
         public String getDisplayName() {
             return Messages.CombinationFilterShortcut_DisplayName();

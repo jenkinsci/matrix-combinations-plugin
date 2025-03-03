@@ -41,13 +41,12 @@ import hudson.model.ParametersAction;
 import hudson.model.ParametersDefinitionProperty;
 import hudson.model.Result;
 import hudson.model.StringParameterValue;
-import java.util.Arrays;
+import java.util.List;
 import org.htmlunit.html.HtmlForm;
 import org.htmlunit.html.HtmlPage;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.jvnet.hudson.test.Bug;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
 
@@ -71,7 +70,7 @@ public class MatrixCombinationsRebuildParameterProviderTest {
         MatrixBuild b1 = p.scheduleBuild2(
                         0,
                         cause,
-                        Arrays.asList(new ParametersAction(new MatrixCombinationsParameterValue(
+                        List.of(new ParametersAction(new MatrixCombinationsParameterValue(
                                 "combinations",
                                 new Boolean[] {true, false, true},
                                 new String[] {"axis1=value1", "axis1=value2", "axis1=value3"}))))
@@ -83,8 +82,9 @@ public class MatrixCombinationsRebuildParameterProviderTest {
 
         // second run (rebuild)
         // asserts that only combinations in the first run are built.
-        WebClient wc = j.createWebClient();
-        HtmlPage page = wc.getPage(b1, "rebuild");
+        WebClient wc = j.createAllow405WebClient();
+        HtmlPage buildPage = wc.getPage(b1);
+        HtmlPage page = buildPage.getAnchorByText("Rebuild").click();
         HtmlForm form = page.getFormByName("config");
         j.submit(form);
 
@@ -112,7 +112,7 @@ public class MatrixCombinationsRebuildParameterProviderTest {
         MatrixBuild b1 = p.scheduleBuild2(
                         0,
                         cause,
-                        Arrays.asList(new ParametersAction(new MatrixCombinationsParameterValue(
+                        List.of(new ParametersAction(new MatrixCombinationsParameterValue(
                                 "combinations", new Boolean[] {false, true, false, true}, new String[] {
                                     "axis1=value1-1,axis2=value2-1",
                                     "axis1=value1-2,axis2=value2-1",
@@ -128,8 +128,9 @@ public class MatrixCombinationsRebuildParameterProviderTest {
 
         // second run (rebuild)
         // asserts that only combinations in the first run are built.
-        WebClient wc = j.createWebClient();
-        HtmlPage page = wc.getPage(b1, "rebuild");
+        WebClient wc = j.createAllow405WebClient();
+        HtmlPage buildPage = wc.getPage(b1);
+        HtmlPage page = buildPage.getAnchorByText("Rebuild").click();
         HtmlForm form = page.getFormByName("config");
         j.submit(form);
 
@@ -145,7 +146,7 @@ public class MatrixCombinationsRebuildParameterProviderTest {
 
     @Ignore(
             "TODO JENKINS-49573: java.lang.ClassCastException: net.sf.json.JSONNull cannot be cast to net.sf.json.JSONObject")
-    @Bug(27233)
+    @Issue("JENKINS-27233")
     @Test
     public void testAppliedForNonMatrixProjectRebuild() throws Exception {
         FreeStyleProject p = j.createFreeStyleProject();
@@ -155,7 +156,7 @@ public class MatrixCombinationsRebuildParameterProviderTest {
         FreeStyleBuild b1 = p.scheduleBuild2(
                         0,
                         cause,
-                        Arrays.asList(new ParametersAction(
+                        List.of(new ParametersAction(
                                 new MatrixCombinationsParameterValue(
                                         "combinations",
                                         new Boolean[] {true, false, true},
@@ -200,8 +201,9 @@ public class MatrixCombinationsRebuildParameterProviderTest {
         j.assertBuildStatus(Result.SUCCESS, b2.getExactRun(new Combination(axes, "value2")));
         j.assertBuildStatus(Result.SUCCESS, b2.getExactRun(new Combination(axes, "value3")));
 
-        WebClient wc = j.createWebClient();
-        HtmlPage page = wc.getPage(b1, "rebuild");
+        WebClient wc = j.createAllow405WebClient();
+        HtmlPage buildPage = wc.getPage(b1);
+        HtmlPage page = buildPage.getAnchorByText("Rebuild").click();
 
         j.assertCombinationChecked(page, true, axes, "value1");
         j.assertCombinationChecked(page, true, axes, "value2");
@@ -230,7 +232,7 @@ public class MatrixCombinationsRebuildParameterProviderTest {
 
         MatrixBuild b = j.assertBuildStatusSuccess(p.scheduleBuild2(0).get());
 
-        WebClient wc = j.createWebClient();
+        WebClient wc = j.createAllow405WebClient();
         HtmlPage page = wc.getPage(b, "rebuild");
 
         assertNull(page.getElementById("test-not-expected"));

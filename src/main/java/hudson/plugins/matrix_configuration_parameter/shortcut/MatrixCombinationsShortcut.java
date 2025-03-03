@@ -24,7 +24,6 @@
 
 package hudson.plugins.matrix_configuration_parameter.shortcut;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -71,12 +70,8 @@ public abstract class MatrixCombinationsShortcut extends AbstractDescribableImpl
     @NonNull
     public final String getCombinationsData(@NonNull final MatrixProject project, @Nullable MatrixBuild build) {
         return StringUtils.join(
-                Collections2.transform(getCombinations(project, build), new Function<Combination, String>() {
-                    @Override
-                    public String apply(Combination c) {
-                        return Integer.toString(c.toIndex(project.getAxes()));
-                    }
-                }),
+                Collections2.transform(
+                        getCombinations(project, build), c -> Integer.toString(c.toIndex(project.getAxes()))),
                 ',');
     }
 
@@ -117,13 +112,7 @@ public abstract class MatrixCombinationsShortcut extends AbstractDescribableImpl
         @Override
         public Collection<Combination> getCombinations(
                 @NonNull MatrixProject project, @CheckForNull MatrixBuild build) {
-            return Collections2.transform(
-                    project.getActiveConfigurations(), new Function<MatrixConfiguration, Combination>() {
-                        @Override
-                        public Combination apply(MatrixConfiguration c) {
-                            return c.getCombination();
-                        }
-                    });
+            return Collections2.transform(project.getActiveConfigurations(), MatrixConfiguration::getCombination);
         }
 
         /**
@@ -152,6 +141,7 @@ public abstract class MatrixCombinationsShortcut extends AbstractDescribableImpl
             /**
              * {@inheritDoc}
              */
+            @NonNull
             @Override
             public String getDisplayName() {
                 return Messages.MatrixCombinationsShortcut_All_DisplayName();
@@ -205,6 +195,7 @@ public abstract class MatrixCombinationsShortcut extends AbstractDescribableImpl
             /**
              * {@inheritDoc}
              */
+            @NonNull
             @Override
             public String getDisplayName() {
                 return Messages.MatrixCombinationsShortcut_None_DisplayName();

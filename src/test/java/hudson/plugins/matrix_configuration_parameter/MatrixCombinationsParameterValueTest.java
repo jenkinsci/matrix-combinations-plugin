@@ -39,11 +39,11 @@ import hudson.model.ParametersAction;
 import hudson.model.ParametersDefinitionProperty;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import jenkins.model.Jenkins;
 import org.htmlunit.html.HtmlPage;
 import org.junit.Rule;
 import org.junit.Test;
-import org.jvnet.hudson.test.Bug;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
 
@@ -97,7 +97,7 @@ public class MatrixCombinationsParameterValueTest {
         j.assertCombinationChecked(page, true, axes, "value1-2", "value2-2");
     }
 
-    @Bug(27233)
+    @Issue("JENKINS-27233")
     @Test
     public void testNonMatrixBuild() throws Exception {
         FreeStyleProject p = j.createFreeStyleProject();
@@ -107,7 +107,7 @@ public class MatrixCombinationsParameterValueTest {
         FreeStyleBuild b = p.scheduleBuild2(
                         0,
                         cause,
-                        Arrays.asList(new ParametersAction(new MatrixCombinationsParameterValue(
+                        List.of(new ParametersAction(new MatrixCombinationsParameterValue(
                                 "combinations",
                                 new Boolean[] {true, false, true},
                                 new String[] {"axis1=value1", "axis1=value2", "axis1=value3"}))))
@@ -118,7 +118,7 @@ public class MatrixCombinationsParameterValueTest {
     }
 
     @Test
-    public void testReadResolve() throws Exception {
+    public void testReadResolve() {
         final String SERIALIZED = "<hudson.plugins.matrix__configuration__parameter.MatrixCombinationsParameterValue>"
                 + "<name>combinations</name>"
                 + "<description>test</description>"
@@ -142,7 +142,7 @@ public class MatrixCombinationsParameterValueTest {
     }
 
     @Test
-    public void testReadResolveOfDefaultMatrixCombinationsParameterValue() throws Exception {
+    public void testReadResolveOfDefaultMatrixCombinationsParameterValue() {
         final String SERIALIZED =
                 "<hudson.plugins.matrix__configuration__parameter.DefaultMatrixCombinationsParameterValue>"
                         + "<name>combinations</name>"

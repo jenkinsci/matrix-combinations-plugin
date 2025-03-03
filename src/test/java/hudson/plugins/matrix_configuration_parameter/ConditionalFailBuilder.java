@@ -57,12 +57,10 @@ public class ConditionalFailBuilder extends Builder {
         String value2 = env.expand(this.value2);
 
         if (value1.equals(value2)) {
-            listener.getLogger()
-                    .println(String.format("Failed as %s (%s) == %s (%s)", this.value1, value1, this.value2, value2));
+            listener.getLogger().printf("Failed as %s (%s) == %s (%s)%n", this.value1, value1, this.value2, value2);
             return false;
         }
-        listener.getLogger()
-                .println(String.format("Passed as %s (%s) != %s (%s)", this.value1, value1, this.value2, value2));
+        listener.getLogger().printf("Passed as %s (%s) != %s (%s)%n", this.value1, value1, this.value2, value2);
         return true;
     }
 }
