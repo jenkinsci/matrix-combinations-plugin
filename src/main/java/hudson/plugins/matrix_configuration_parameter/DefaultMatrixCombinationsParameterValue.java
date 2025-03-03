@@ -28,16 +28,19 @@ import hudson.matrix.AxisList;
 import hudson.matrix.Combination;
 import hudson.model.AbstractBuild;
 import hudson.util.VariableResolver;
+import java.io.Serial;
 
 /**
  * {@link MatrixCombinationsParameterValue} created when the build started
  * without specifying parameter.
- *
+ * <p>
  * {@link MatrixCombinationsParameterValue#getCombinations()}
  * does not work (always return an empty list).
  */
 public class DefaultMatrixCombinationsParameterValue extends MatrixCombinationsParameterValue {
+    @Serial
     private static final long serialVersionUID = -812826069693143705L;
+
     private final String combinationFilter;
 
     public DefaultMatrixCombinationsParameterValue(String name, String description, String combinationFilter) {
@@ -55,14 +58,11 @@ public class DefaultMatrixCombinationsParameterValue extends MatrixCombinationsP
 
     @Override
     public VariableResolver<String> createVariableResolver(AbstractBuild<?, ?> build) {
-        return new VariableResolver<String>() {
-            @Override
-            public String resolve(String name) {
-                if (!DefaultMatrixCombinationsParameterValue.this.name.equals(name)) {
-                    return null;
-                }
-                return (combinationFilter != null) ? combinationFilter : "";
+        return name -> {
+            if (!DefaultMatrixCombinationsParameterValue.this.name.equals(name)) {
+                return null;
             }
+            return (combinationFilter != null) ? combinationFilter : "";
         };
     }
 

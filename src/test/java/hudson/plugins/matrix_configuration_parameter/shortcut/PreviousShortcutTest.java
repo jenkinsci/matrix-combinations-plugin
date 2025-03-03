@@ -37,7 +37,7 @@ import hudson.model.Result;
 import hudson.plugins.matrix_configuration_parameter.ConditionalFailBuilder;
 import hudson.plugins.matrix_configuration_parameter.MatrixCombinationsJenkinsRule;
 import hudson.plugins.matrix_configuration_parameter.MatrixCombinationsParameterDefinition;
-import java.util.Arrays;
+import java.util.List;
 import org.htmlunit.html.HtmlPage;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -55,8 +55,8 @@ public class PreviousShortcutTest {
         AxisList axes = new AxisList(new TextAxis("axis1", "value1", "value2", "value3"));
         MatrixProject p = j.createMatrixProject();
         p.setAxes(axes);
-        MatrixCombinationsParameterDefinition def = new MatrixCombinationsParameterDefinition(
-                "COMBINATIONS", "", "", Arrays.<MatrixCombinationsShortcut>asList(new PreviousShortcut()));
+        MatrixCombinationsParameterDefinition def =
+                new MatrixCombinationsParameterDefinition("COMBINATIONS", "", "", List.of(new PreviousShortcut()));
         p.addProperty(new ParametersDefinitionProperty(def));
 
         j.configRoundtrip((Item) p);
@@ -70,8 +70,8 @@ public class PreviousShortcutTest {
         AxisList axes = new AxisList(new TextAxis("axis1", "value1", "value2", "value3"));
         MatrixProject p = j.createMatrixProject();
         p.setAxes(axes);
-        MatrixCombinationsParameterDefinition def = new MatrixCombinationsParameterDefinition(
-                "COMBINATIONS", "", "", Arrays.<MatrixCombinationsShortcut>asList(new PreviousShortcut()));
+        MatrixCombinationsParameterDefinition def =
+                new MatrixCombinationsParameterDefinition("COMBINATIONS", "", "", List.of(new PreviousShortcut()));
         p.addProperty(new ParametersDefinitionProperty(def));
         p.getBuildersList().add(new ConditionalFailBuilder("${axis1}", "value2"));
 
@@ -106,8 +106,8 @@ public class PreviousShortcutTest {
         AxisList axes = new AxisList(new TextAxis("axis1", "value1", "value2", "value3"));
         MatrixProject p = j.createMatrixProject();
         p.setAxes(axes);
-        MatrixCombinationsParameterDefinition def = new MatrixCombinationsParameterDefinition(
-                "COMBINATIONS", "", "", Arrays.<MatrixCombinationsShortcut>asList(new PreviousShortcut()));
+        MatrixCombinationsParameterDefinition def =
+                new MatrixCombinationsParameterDefinition("COMBINATIONS", "", "", List.of(new PreviousShortcut()));
         p.addProperty(new ParametersDefinitionProperty(def));
         p.setCombinationFilter("axis1 != 'value3'");
         p.getBuildersList().add(new ConditionalFailBuilder("${axis1}", "value2"));
@@ -127,8 +127,8 @@ public class PreviousShortcutTest {
         AxisList axes = new AxisList(new TextAxis("axis1", "value1", "value2", "value3"));
         MatrixProject p = j.createMatrixProject();
         p.setAxes(axes);
-        MatrixCombinationsParameterDefinition def = new MatrixCombinationsParameterDefinition(
-                "COMBINATIONS", "", "", Arrays.<MatrixCombinationsShortcut>asList(new PreviousShortcut()));
+        MatrixCombinationsParameterDefinition def =
+                new MatrixCombinationsParameterDefinition("COMBINATIONS", "", "", List.of(new PreviousShortcut()));
         p.addProperty(new ParametersDefinitionProperty(def));
         p.getBuildersList().add(new ConditionalFailBuilder("${axis1}", "value2"));
 
@@ -155,7 +155,8 @@ public class PreviousShortcutTest {
         j.assertBuildStatus(Result.SUCCESS, b3.getExactRun(new Combination(axes, "value3")));
 
         WebClient wc = j.createAllow405WebClient();
-        HtmlPage page = wc.getPage(b2, "rebuild");
+        HtmlPage buildPage = wc.getPage(b2);
+        HtmlPage page = buildPage.getAnchorByText("Rebuild").click();
 
         j.clickShortcut(page, "Previous");
 

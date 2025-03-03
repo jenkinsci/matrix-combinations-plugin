@@ -23,8 +23,8 @@
  */
 package hudson.plugins.matrix_configuration_parameter;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.markup.MarkupFormatter;
 import hudson.matrix.AxisList;
 import hudson.matrix.Combination;
@@ -32,17 +32,18 @@ import hudson.model.AbstractBuild;
 import hudson.model.ParameterValue;
 import hudson.util.VariableResolver;
 import java.io.IOException;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.Nonnull;
 import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 public class MatrixCombinationsParameterValue extends ParameterValue {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = Logger.getLogger(MatrixCombinationsParameterValue.class.getName());
@@ -66,7 +67,7 @@ public class MatrixCombinationsParameterValue extends ParameterValue {
     public MatrixCombinationsParameterValue(String name, String description, List<String> combinations) {
         super(name, description);
         this.combinations =
-                (combinations != null) ? Collections.unmodifiableList(combinations) : Collections.<String>emptyList();
+                (combinations != null) ? Collections.unmodifiableList(combinations) : Collections.emptyList();
     }
 
     @Deprecated
@@ -93,11 +94,12 @@ public class MatrixCombinationsParameterValue extends ParameterValue {
      * @return combinations to build
      * @since 1.1.0
      */
-    @Nonnull
+    @NonNull
     public List<String> getCombinations() {
         return combinations;
     }
 
+    @Serial
     protected Object readResolve() {
         if (combinations == null) {
             // < 1.1.0
@@ -109,7 +111,7 @@ public class MatrixCombinationsParameterValue extends ParameterValue {
     }
 
     private static List<String> convertValuesAndConfs(Boolean[] values, String[] confs) {
-        List<String> ret = new ArrayList<String>();
+        List<String> ret = new ArrayList<>();
 
         if (values == null || confs == null) {
             return ret;
@@ -125,24 +127,17 @@ public class MatrixCombinationsParameterValue extends ParameterValue {
 
     @Override
     public VariableResolver<String> createVariableResolver(AbstractBuild<?, ?> build) {
-        return new VariableResolver<String>() {
-            @Override
-            public String resolve(String name) {
-                if (!MatrixCombinationsParameterValue.this.name.equals(name)) {
-                    return null;
-                }
-
-                return StringUtils.join(
-                        Lists.transform(getCombinations(), new Function<String, String>() {
-                            @Override
-                            public String apply(String combination) {
-                                return String.format(
-                                        "(%s')",
-                                        combination.replace("=", " == '").replace(",", "' && "));
-                            }
-                        }),
-                        " || ");
+        return name -> {
+            if (!MatrixCombinationsParameterValue.this.name.equals(name)) {
+                return null;
             }
+
+            return StringUtils.join(
+                    Lists.transform(
+                            getCombinations(),
+                            combination -> String.format(
+                                    "(%s')", combination.replace("=", " == '").replace(",", "' && "))),
+                    " || ");
         };
     }
 
@@ -181,7 +176,7 @@ public class MatrixCombinationsParameterValue extends ParameterValue {
 
     @Override
     public String toString() {
-        StringBuffer valueStr = new StringBuffer("");
+        StringBuilder valueStr = new StringBuilder();
         valueStr.append("(MatrixCombinationsParameterValue) " + getName() + "\n");
         for (String combination : getCombinations()) {
             valueStr.append(String.format("%s%n", combination));
@@ -191,7 +186,7 @@ public class MatrixCombinationsParameterValue extends ParameterValue {
 
     /**
      * return parameter description, applying the configured {@link MarkupFormatter} for jenkins instance.
-     *
+     * <p>
      * This is a backport from Jenkins-2.44 or Jenkins-2.32.2.
      *
      * @since 1.2.0
@@ -199,7 +194,7 @@ public class MatrixCombinationsParameterValue extends ParameterValue {
     @Override
     public String getFormattedDescription() {
         try {
-            return Jenkins.getActiveInstance().getMarkupFormatter().translate(getDescription());
+            return Jenkins.get().getMarkupFormatter().translate(getDescription());
         } catch (IOException e) {
             LOGGER.log(
                     Level.WARNING,

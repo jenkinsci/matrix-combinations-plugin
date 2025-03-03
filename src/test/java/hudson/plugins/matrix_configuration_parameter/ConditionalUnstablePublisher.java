@@ -24,6 +24,7 @@
 
 package hudson.plugins.matrix_configuration_parameter;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.Launcher;
@@ -64,12 +65,10 @@ public class ConditionalUnstablePublisher extends Recorder {
 
         if (value1.equals(value2)) {
             build.setResult(Result.UNSTABLE);
-            listener.getLogger()
-                    .println(String.format("Unstable as %s (%s) == %s (%s)", this.value1, value1, this.value2, value2));
+            listener.getLogger().printf("Unstable as %s (%s) == %s (%s)%n", this.value1, value1, this.value2, value2);
             return true;
         }
-        listener.getLogger()
-                .println(String.format("Passed as %s (%s) != %s (%s)", this.value1, value1, this.value2, value2));
+        listener.getLogger().printf("Passed as %s (%s) != %s (%s)%n", this.value1, value1, this.value2, value2);
         return true;
     }
 
@@ -91,6 +90,7 @@ public class ConditionalUnstablePublisher extends Recorder {
             return true;
         }
 
+        @NonNull
         @Override
         public String getDisplayName() {
             return "ConditionalUnstablePublisher";

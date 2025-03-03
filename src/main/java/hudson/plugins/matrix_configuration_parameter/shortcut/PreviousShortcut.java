@@ -24,17 +24,15 @@
 
 package hudson.plugins.matrix_configuration_parameter.shortcut;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import hudson.Extension;
 import hudson.matrix.Combination;
 import hudson.matrix.MatrixBuild;
 import hudson.matrix.MatrixProject;
-import hudson.matrix.MatrixRun;
 import java.util.Collection;
 import java.util.Collections;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
@@ -47,24 +45,19 @@ public class PreviousShortcut extends MatrixCombinationsShortcut {
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NonNull
     @Override
-    public Collection<Combination> getCombinations(@Nonnull MatrixProject project, @CheckForNull MatrixBuild build) {
+    public Collection<Combination> getCombinations(@NonNull MatrixProject project, @Nullable MatrixBuild build) {
         if (build == null) {
             return Collections.emptyList();
         }
-        return Lists.transform(build.getExactRuns(), new Function<MatrixRun, Combination>() {
-            @Override
-            public Combination apply(MatrixRun r) {
-                return r.getParent().getCombination();
-            }
-        });
+        return Lists.transform(build.getExactRuns(), r -> r.getParent().getCombination());
     }
 
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NonNull
     @Override
     public String getName() {
         return getDescriptor().getDisplayName();
@@ -73,7 +66,7 @@ public class PreviousShortcut extends MatrixCombinationsShortcut {
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NonNull
     @Override
     public String getId() {
         return "Previous";
@@ -87,6 +80,7 @@ public class PreviousShortcut extends MatrixCombinationsShortcut {
         /**
          * {@inheritDoc}
          */
+        @NonNull
         @Override
         public String getDisplayName() {
             return Messages.PreviousShortcut_DisplayName();
