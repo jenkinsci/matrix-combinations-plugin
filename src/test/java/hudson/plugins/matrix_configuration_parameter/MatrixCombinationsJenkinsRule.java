@@ -29,12 +29,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import hudson.matrix.AxisList;
 import hudson.matrix.Combination;
 import hudson.matrix.MatrixProject;
 import java.io.IOException;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 import org.htmlunit.WebResponse;
 import org.htmlunit.html.DomNode;
 import org.htmlunit.html.HtmlCheckBoxInput;
@@ -129,31 +129,31 @@ public class MatrixCombinationsJenkinsRule extends JenkinsRule {
         assertEquals(checked, checkbox.isChecked());
     }
 
-    @Nonnull
-    protected static HtmlElement nodeToElement(@CheckForNull DomNode node) {
+    @NonNull
+    protected static HtmlElement nodeToElement(@Nullable DomNode node) {
         return nodeToElement(node, HtmlElement.class);
     }
 
-    @Nonnull
-    protected static <T extends Object> T nodeToElement(@CheckForNull Object node, Class<T> c) throws AssertionError {
+    @NonNull
+    protected static <T extends Object> T nodeToElement(@Nullable Object node, Class<T> c) throws AssertionError {
         assertNotNull("Node is null", node);
         assertThat(String.format("Node is not %s: %s", c, node), node, instanceOf(c));
         return (T) node;
     }
 
-    @Nonnull
-    protected static HtmlElement firstByXPath(@Nonnull HtmlElement root, String xpath) throws AssertionError {
+    @NonNull
+    protected static HtmlElement firstByXPath(@NonNull HtmlElement root, String xpath) throws AssertionError {
         return byXPath(root, xpath, 0, HtmlElement.class);
     }
 
-    @Nonnull
-    protected static <T extends Object> T firstByXPath(@Nonnull HtmlElement root, String xpath, Class<T> c)
+    @NonNull
+    protected static <T extends Object> T firstByXPath(@NonNull HtmlElement root, String xpath, Class<T> c)
             throws AssertionError {
         return byXPath(root, xpath, 0, c);
     }
 
-    @Nonnull
-    protected static <T extends Object> T byXPath(@Nonnull HtmlElement root, String xpath, int index, Class<T> c)
+    @NonNull
+    protected static <T extends Object> T byXPath(@NonNull HtmlElement root, String xpath, int index, Class<T> c)
             throws AssertionError {
         Object o = root.getByXPath(xpath).get(index);
         assertNotNull(String.format("Failed to fetch element #%d for query '%s'. Node: %s", index, xpath, root), o);

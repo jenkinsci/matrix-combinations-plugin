@@ -28,6 +28,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.Util;
 import hudson.matrix.Combination;
@@ -40,7 +41,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import javax.annotation.Nonnull;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -88,7 +88,7 @@ public class ResultShortcut extends MatrixCombinationsShortcut {
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NonNull
     @Override
     public String getName() {
         return name;

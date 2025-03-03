@@ -26,6 +26,8 @@ package hudson.plugins.matrix_configuration_parameter.shortcut;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import hudson.Extension;
 import hudson.ExtensionPoint;
 import hudson.matrix.Combination;
@@ -36,7 +38,6 @@ import hudson.model.AbstractDescribableImpl;
 import java.util.Collection;
 import java.util.Collections;
 import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -56,9 +57,9 @@ public abstract class MatrixCombinationsShortcut extends AbstractDescribableImpl
      *     {@code null} if there's no builds.
      * @return combinations to check.
      */
-    @Nonnull
+    @NonNull
     public abstract Collection<Combination> getCombinations(
-            @Nonnull MatrixProject project, @CheckForNull MatrixBuild build);
+            @NonNull MatrixProject project, @Nullable MatrixBuild build);
 
     /**
      * Return a value used for javascript.
@@ -67,8 +68,8 @@ public abstract class MatrixCombinationsShortcut extends AbstractDescribableImpl
      * @param build the target build
      * @return comma-separated list of combination indices
      */
-    @Nonnull
-    public final String getCombinationsData(@Nonnull final MatrixProject project, @CheckForNull MatrixBuild build) {
+    @NonNull
+    public final String getCombinationsData(@NonNull final MatrixProject project, @Nullable MatrixBuild build) {
         return StringUtils.join(
                 Collections2.transform(getCombinations(project, build), new Function<Combination, String>() {
                     @Override
@@ -82,13 +83,13 @@ public abstract class MatrixCombinationsShortcut extends AbstractDescribableImpl
     /**
      * @return name used for the link text.
      */
-    @Nonnull
+    @NonNull
     public abstract String getName();
 
     /**
      * @return name used to distinguish links.
      */
-    @Nonnull
+    @NonNull
     public abstract String getId();
 
     /**
@@ -112,10 +113,10 @@ public abstract class MatrixCombinationsShortcut extends AbstractDescribableImpl
         /**
          * {@inheritDoc}
          */
-        @Nonnull
+        @NonNull
         @Override
         public Collection<Combination> getCombinations(
-                @Nonnull MatrixProject project, @CheckForNull MatrixBuild build) {
+                @NonNull MatrixProject project, @CheckForNull MatrixBuild build) {
             return Collections2.transform(
                     project.getActiveConfigurations(), new Function<MatrixConfiguration, Combination>() {
                         @Override
@@ -128,7 +129,7 @@ public abstract class MatrixCombinationsShortcut extends AbstractDescribableImpl
         /**
          * {@inheritDoc}
          */
-        @Nonnull
+        @NonNull
         @Override
         public String getName() {
             return getDescriptor().getDisplayName();
@@ -137,7 +138,7 @@ public abstract class MatrixCombinationsShortcut extends AbstractDescribableImpl
         /**
          * {@inheritDoc}
          */
-        @Nonnull
+        @NonNull
         @Override
         public String getId() {
             return "All";
@@ -171,17 +172,17 @@ public abstract class MatrixCombinationsShortcut extends AbstractDescribableImpl
         /**
          * {@inheritDoc}
          */
-        @Nonnull
+        @NonNull
         @Override
         public Collection<Combination> getCombinations(
-                @Nonnull MatrixProject project, @CheckForNull MatrixBuild build) {
+                @NonNull MatrixProject project, @CheckForNull MatrixBuild build) {
             return Collections.emptyList();
         }
 
         /**
          * {@inheritDoc}
          */
-        @Nonnull
+        @NonNull
         @Override
         public String getName() {
             return getDescriptor().getDisplayName();
@@ -190,7 +191,7 @@ public abstract class MatrixCombinationsShortcut extends AbstractDescribableImpl
         /**
          * {@inheritDoc}
          */
-        @Nonnull
+        @NonNull
         @Override
         public String getId() {
             return "None";

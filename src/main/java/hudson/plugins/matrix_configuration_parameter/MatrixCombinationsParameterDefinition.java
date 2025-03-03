@@ -23,6 +23,7 @@
  */
 package hudson.plugins.matrix_configuration_parameter;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import hudson.model.Result;
@@ -32,7 +33,6 @@ import hudson.plugins.matrix_configuration_parameter.shortcut.MatrixCombinations
 import hudson.plugins.matrix_configuration_parameter.shortcut.ResultShortcut;
 import java.util.Arrays;
 import java.util.List;
-import javax.annotation.Nonnull;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -60,7 +60,7 @@ public class MatrixCombinationsParameterDefinition extends SimpleParameterDefini
      * @return list of shortcuts
      * @since 1.1.0
      */
-    @Nonnull
+    @NonNull
     public List<MatrixCombinationsShortcut> getShortcutList() {
         return shortcutList;
     }

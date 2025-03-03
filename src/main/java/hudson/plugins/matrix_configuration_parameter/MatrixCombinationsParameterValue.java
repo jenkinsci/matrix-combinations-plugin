@@ -25,6 +25,7 @@ package hudson.plugins.matrix_configuration_parameter;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.markup.MarkupFormatter;
 import hudson.matrix.AxisList;
 import hudson.matrix.Combination;
@@ -37,7 +38,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.Nonnull;
 import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -93,7 +93,7 @@ public class MatrixCombinationsParameterValue extends ParameterValue {
      * @return combinations to build
      * @since 1.1.0
      */
-    @Nonnull
+    @NonNull
     public List<String> getCombinations() {
         return combinations;
     }
